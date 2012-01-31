@@ -1,0 +1,9 @@
+[submodule "vendor/clojurescript"]
+	path = vendor/clojurescript
+	url = git://github.com/clojure/clojurescript
+[submodule "vendor/pinot"]
+	path = vendor/pinot
+	url = git://github.com/ibdknox/pinot
+[submodule "vendor/cassowary-coffee"]
+	path = vendor/cassowary-coffee
+	url = git://github.com/lynaghk/cassowary-coffee
