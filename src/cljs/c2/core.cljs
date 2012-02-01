@@ -217,7 +217,7 @@ Optional enter, update, and exit functions called before DOM is changed; return 
     (if post-fn
       ;;Give the browser 10 ms to get its shit together, if the post-fn involves advanced layout.
       ;;Without this delay, CSS3 animations sometimes don't happen.
-      (timeout 10 post-fn))))
+      (timeout 10 #(post-fn data)))))
 
 
 (defn instantiate-attrs
