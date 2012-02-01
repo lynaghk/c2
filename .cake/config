@@ -2,4 +2,4 @@ project.classpath = src/cljs\
 :src/clj\
 :vendor/clojurescript/src/clj\
 :vendor/clojurescript/src/cljs\
-:vendor/pinot/src\
+:vendor/pinot/src
