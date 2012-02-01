@@ -1,10 +1,12 @@
 (ns c2.core
-  (:use-macros [c2.util :only [p timeout]])
+  (:use-macros [c2.util :only [p timeout]]
+               [clojure.core.match.js :only [match]])
   (:use [cljs.reader :only [read-string]])
   (:require [pinot.html :as html]
             [pinot.dom :as dom]
             [goog.dom :as gdom]
-            [clojure.set :as set]))
+            [clojure.set :as set]
+            [clojure.string :as string]))
 
 ;;Lil' helpers
 (defn translate [x y]
@@ -32,10 +34,64 @@
     ;;(.-outerHTML x)
     x))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;DOM manipulation & hiccup-like things
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn children [node]
   (filter #(= 1 (.-nodeType %))
           (.-childNodes node)))
+
+;; From Weavejester's Hiccup.
+(def ^{:doc "Regular expression that parses a CSS-style id and class from a tag name."}
+  re-tag #"([^\s\.#]+)(?:#([^\s\.#]+))?(?:\.([^\s#]+))?")
+
+(defn merge-dom [dom-node el]
+  (when (not= (keyword (.toLowerCase (.-nodeName dom-node)))
+              (:tag el))
+    (throw "Cannot merge el into node of a different type"))
+
+  (dom/attr dom-node (:attr el))
+  (when-let [txt (first (filter string? (:children el)))]
+    (dom/text dom-node txt))
+  (doseq [[dom-child el-child] (map vector (children dom-node)
+                                    (remove string? (:children el)))]
+    (merge-dom dom-child  el-child)))
+
+
+(def xmlns {:xhtml "http://www.w3.org/1999/xhtml"
+            :svg "http://www.w3.org/2000/svg"})
+
+(defn cannonicalize
+  "Parse hiccup-like vec into map of {:tag :attr :children}, or return string as itself.
+   Based on Pinot's html/normalize-element."
+  [x]
+  (match [x]
+         [(str :when string?)] str
+         ;;todo, make explicit match here for attr map and clean up crazy Pinot logic below
+         [[tag & content]]   (let [[_ tag id class] (re-matches re-tag (name tag))
+                                   [nsp tag]     (let [[nsp t] (string/split tag #":")
+                                                       ns-xmlns (xmlns (keyword nsp))]
+                                                   (if t
+                                                     [(or ns-xmlns nsp) (keyword t)]
+                                                     [(:xhtml xmlns) (keyword nsp)]))
+                                   tag-attrs        (into {}
+                                                          (filter #(not (nil? (second %)))
+                                                                  {:id (or id nil)
+                                                                   :class (if class (string/replace class #"\." " "))}))
+                                   map-attrs        (first content)]
+
+                               (if (map? map-attrs)
+                                 {:tag  tag :attr (merge tag-attrs map-attrs) :children  (map cannonicalize (next content))}
+                                 {:tag tag :attr tag-attrs :children  (map cannonicalize content)}))))
+
+
+
+
+
+
+
+
 
 
 ;;Attach data in Clojure reader readable format to the DOM.
@@ -99,8 +155,9 @@ Optional enter, update, and exit functions called before DOM is changed; return 
                                            (p "no-op enter called")
                                            new-node)
                                   update (fn [d idx old-node new-node]
+                                           (merge-dom old-node (cannonicalize new-node))
                                            (p "no-op update called")
-                                           new-node)
+                                           nil)
                                   exit   (fn [d idx old-node]
                                            (p "default remove called"))}}]
 
@@ -147,6 +204,7 @@ Optional enter, update, and exit functions called before DOM is changed; return 
           ;;and its data is not equal to the new data, replace it
           (if (not= d (:datum old))
             (when-let [updated-node (update d idx (:node old) new-node)]
+              
               (dom/replace (:node old) (html/html updated-node)))
             ;;otherwise, append the old node (effectively moving it to the correct index in the container)
             (gdom/appendChild container (:node old)))

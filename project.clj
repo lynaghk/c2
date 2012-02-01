@@ -4,6 +4,7 @@
                  [com.google.javascript/closure-compiler "r1592"]
                  
                  ;;Required for C2 because of its Pinot submodule dependency; will drop when new Pinot JAR is cut or C2 stops using Pinot all together.
+                 [clojure.core.match.js :only [match]]
                  [goog-jar "1.0.0"]]
   
   :dev-dependencies [[midje "1.3.1"]])
