@@ -1,6 +1,7 @@
 (ns c2.core
   (:use-macros [c2.util :only [p timeout]]
-               [clojure.core.match.js :only [match]])
+               [clojure.core.match.js :only [match]]
+               [iterate :only [iter]])
   (:use [cljs.reader :only [read-string]])
   (:require [pinot.html :as html]
             [pinot.dom :as dom]
@@ -54,9 +55,9 @@
   (dom/attr dom-node (:attr el))
   (when-let [txt (first (filter string? (:children el)))]
     (dom/text dom-node txt))
-  (doseq [[dom-child el-child] (map vector (children dom-node)
-                                    (remove string? (:children el)))]
-    (merge-dom dom-child  el-child)))
+  (iter {for [dom-child el-child] in (map vector (children dom-node)
+                                          (remove string? (:children el)))}
+        (merge-dom dom-child  el-child)))
 
 
 (def xmlns {:xhtml "http://www.w3.org/1999/xhtml"
@@ -189,30 +190,30 @@ Optional enter, update, and exit functions called before DOM is changed; return 
                                                       (children container))))]
 
     ;;Remove any stale nodes
-    (doseq [k (set/difference (set (keys existing-nodes-by-key))
-                              (set (map key-fn data (range))))]
-      (let [{:keys [node idx datum]} (existing-nodes-by-key k)]
-        (if (exit datum idx node)
-          (dom/unappend node))))
+    (iter {for k in (set/difference (set (keys existing-nodes-by-key))
+                                    (set (map key-fn data (range))))}
+          (let [{:keys [node idx datum]} (existing-nodes-by-key k)]
+            (if (exit datum idx node)
+              (dom/unappend node))))
 
 
     ;;For each datum, update existing nodes and add new ones
-    (doseq [[idx d] (map-indexed vector data)]
-      (let [new-node (attach-data (mapping d idx) d)]
-        ;;If there's an existing node
-        (if-let [old (existing-nodes-by-key (key-fn d idx))]
-          (do
-            ;;append it (effectively moving it to the correct index in the container)
-            (gdom/appendChild container (:node old))
-            
-            ;;If its data is not equal to the new data, replace it
-            (if (not= d (:datum old))
-              (when-let [updated-node (update d idx (:node old) new-node)]
-                (dom/replace (:node old) (html/html updated-node)))))
+    (iter {for [idx d] in (map-indexed vector data)}
+          (let [new-node (attach-data (mapping d idx) d)]
+            ;;If there's an existing node
+            (if-let [old (existing-nodes-by-key (key-fn d idx))]
+              (do
+                ;;append it (effectively moving it to the correct index in the container)
+                (gdom/appendChild container (:node old))
 
-          (let [new-dom-node (html/html new-node)]
-            (dom/append container new-dom-node)
-            (enter d idx new-dom-node)))))
+                ;;If its data is not equal to the new data, replace it
+                (if (not= d (:datum old))
+                  (when-let [updated-node (update d idx (:node old) new-node)]
+                    (dom/replace (:node old) (html/html updated-node)))))
+
+              (let [new-dom-node (html/html new-node)]
+                (dom/append container new-dom-node)
+                (enter d idx new-dom-node)))))
 
     ;;Run post-fn, if it was given
     (if post-fn
@@ -232,8 +233,8 @@ Optional enter, update, and exit functions called before DOM is changed; return 
                [k v]))))
 
 (defn apply-attrs! [elem attrs d idx]
-  (doseq [[k v] (instantiate-attrs attrs d idx)]
-    (dom/attr elem (name k) v)))
+  (iter {for [k v] in (instantiate-attrs attrs d idx)}
+        (dom/attr elem (name k) v)))
 
 
 
