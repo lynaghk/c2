@@ -201,13 +201,14 @@ Optional enter, update, and exit functions called before DOM is changed; return 
       (let [new-node (attach-data (mapping d idx) d)]
         ;;If there's an existing node
         (if-let [old (existing-nodes-by-key (key-fn d idx))]
-          ;;and its data is not equal to the new data, replace it
-          (if (not= d (:datum old))
-            (when-let [updated-node (update d idx (:node old) new-node)]
-              
-              (dom/replace (:node old) (html/html updated-node)))
-            ;;otherwise, append the old node (effectively moving it to the correct index in the container)
-            (gdom/appendChild container (:node old)))
+          (do
+            ;;append it (effectively moving it to the correct index in the container)
+            (gdom/appendChild container (:node old))
+            
+            ;;If its data is not equal to the new data, replace it
+            (if (not= d (:datum old))
+              (when-let [updated-node (update d idx (:node old) new-node)]
+                (dom/replace (:node old) (html/html updated-node)))))
 
           (let [new-dom-node (html/html new-node)]
             (dom/append container new-dom-node)
