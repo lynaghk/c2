@@ -48,8 +48,8 @@
   re-tag #"([^\s\.#]+)(?:#([^\s\.#]+))?(?:\.([^\s#]+))?")
 
 (defn merge-dom [dom-node el]
-  (when (not= (keyword (.toLowerCase (.-nodeName dom-node)))
-              (:tag el))
+  (when (not= (.toLowerCase (.-nodeName dom-node))
+              (.toLowerCase (name (:tag el))))
     (throw "Cannot merge el into node of a different type"))
 
   (dom/attr dom-node (:attr el))
@@ -57,7 +57,7 @@
     (dom/text dom-node txt))
   (iter {for [dom-child el-child] in (map vector (children dom-node)
                                           (remove string? (:children el)))}
-        (merge-dom dom-child  el-child)))
+        (merge-dom dom-child el-child)))
 
 
 (def xmlns {:xhtml "http://www.w3.org/1999/xhtml"
