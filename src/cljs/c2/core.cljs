@@ -154,11 +154,10 @@ Optional enter, update, and exit functions called before DOM is changed; return 
                              :or {key-fn (fn [d idx] idx)
                                   enter  (fn [d idx new-node]
                                            #_(p "no-op enter called")
-                                           new-node)
+                                           true)
                                   update (fn [d idx old-node new-node]
-                                           (merge-dom old-node (cannonicalize new-node))
                                            #_(p "no-op update called")
-                                           nil)
+                                           true)
                                   exit   (fn [d idx old-node]
                                            #_(p "default remove called")
                                            true)}}]
@@ -187,7 +186,7 @@ Optional enter, update, and exit functions called before DOM is changed; return 
                                                                             :idx i
                                                                             :datum datum}]))
                                                     (if selector
-                                                      (dom/query selector container)
+                                                      (select selector container)
                                                       (children container))))]
 
     ;;Remove any stale nodes
@@ -207,14 +206,14 @@ Optional enter, update, and exit functions called before DOM is changed; return 
                 ;;append it (effectively moving it to the correct index in the container)
                 (gdom/appendChild container (:node old))
 
-                ;;If its data is not equal to the new data, replace it
+                ;;If its data is not equal to the new data, update it
                 (if (not= d (:datum old))
-                  (when-let [updated-node (update d idx (:node old) new-node)]
-                    (dom/replace (:node old) (html/html updated-node)))))
-
+                  (if (update d idx (:node old) new-node)
+                    (merge-dom (:node old) (cannonicalize new-node)))))
+              
               (let [new-dom-node (html/html new-node)]
-                (dom/append container new-dom-node)
-                (enter d idx new-dom-node)))))
+                (if (enter d idx new-dom-node)
+                  (dom/append container new-dom-node))))))
 
     ;;Run post-fn, if it was given
     (if post-fn
