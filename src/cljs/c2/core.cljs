@@ -153,14 +153,14 @@ Optional enter, update, and exit functions called before DOM is changed; return 
   [container data mapping & {:keys [selector key-fn post-fn update exit enter]
                              :or {key-fn (fn [d idx] idx)
                                   enter  (fn [d idx new-node]
-                                           (p "no-op enter called")
+                                           #_(p "no-op enter called")
                                            new-node)
                                   update (fn [d idx old-node new-node]
                                            (merge-dom old-node (cannonicalize new-node))
-                                           (p "no-op update called")
+                                           #_(p "no-op update called")
                                            nil)
                                   exit   (fn [d idx old-node]
-                                           (p "default remove called"))}}]
+                                           #_(p "default remove called"))}}]
 
   (let [container (select container)
         ;;This logic should be abstracted out via a (unify!) multimethod, once (apply multimethod) is fixed in ClojureScript
