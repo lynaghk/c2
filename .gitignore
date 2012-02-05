@@ -6,3 +6,4 @@ lib
 classes
 build
 resources/*
+out/

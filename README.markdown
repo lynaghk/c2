@@ -36,3 +36,14 @@ to get dependencies, then bootstrap-install Clojurescript:
 
 and add its jars to your classpath.
 This repository includes a `.cake/config` with the appropriate paths.
+
+
+
+Testing
+=======
+
+Use PhantomJS with highly advanced "list-of-assertions" testing framework:
+
+    cake run script/compile_tests.clj && phantomjs test/integration/runner.js
+
+or, if you're too cool to go headless, open up `test/integration/runner.html` in your browser.
