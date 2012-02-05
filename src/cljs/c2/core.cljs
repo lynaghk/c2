@@ -160,7 +160,8 @@ Optional enter, update, and exit functions called before DOM is changed; return 
                                            #_(p "no-op update called")
                                            nil)
                                   exit   (fn [d idx old-node]
-                                           #_(p "default remove called"))}}]
+                                           #_(p "default remove called")
+                                           true)}}]
 
   (let [container (select container)
         ;;This logic should be abstracted out via a (unify!) multimethod, once (apply multimethod) is fixed in ClojureScript
