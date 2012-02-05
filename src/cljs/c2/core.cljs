@@ -138,11 +138,11 @@
 
 
 (defmulti select node-type)
-(defmethod select :selector [selector] (first (dom/query selector)))
+(defmethod select :selector [selector] (first (gdom/query selector)))
 (defmethod select :dom [node] node)
 
 (defmulti select-all node-type)
-(defmethod select-all :selector [selector] (dom/query selector))
+(defmethod select-all :selector [selector] (gdom/query selector))
 (defmethod select-all :dom [nodes] nodes)
 
 (defn unify!
@@ -194,7 +194,7 @@ Optional enter, update, and exit functions called before DOM is changed; return 
                                     (set (map key-fn data (range))))}
           (let [{:keys [node idx datum]} (existing-nodes-by-key k)]
             (if (exit datum idx node)
-              (dom/unappend node))))
+              (gdom/removeNode node))))
 
 
     ;;For each datum, update existing nodes and add new ones
@@ -231,12 +231,6 @@ Optional enter, update, and exit functions called before DOM is changed; return 
                       (fn? v) (dont-carity v d idx)
                       :else v)]
                [k v]))))
-
-(defn apply-attrs! [elem attrs d idx]
-  (iter {for [k v] in (instantiate-attrs attrs d idx)}
-        (dom/attr elem (name k) v)))
-
-
 
 (defn snode
   "Returns a function of [datum, index] that builds `tag` nodes with the specified attributes

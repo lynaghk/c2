@@ -20,7 +20,7 @@
 
 (defn clear! [] (set! (.-innerHTML container) ""))
 
-
+(print "\n\nSingle node enter/update/exit\n=============================")
 (let [n 100
       mapping (fn [d idx] [:span {:x d} (str d)])]
   
@@ -58,27 +58,24 @@
 
 (clear!)
 
-(println "More complex dataset")
+(print "\n\nMore complex dataset\n====================")
 (let [n 100
       data (map #(hash-map :id % :val (str (rand)))
                 (range n))
       new-data (map #(assoc % :val (str (rand))) data)
       mapping (fn [d idx] [:div {:val (:val d)}
                           [:span (str (:id d))]])]
-  
-  (unify! container data mapping
-          :key-fn :id)
-
+  (profile "ENTER node hiearchy"
+           (unify! container data mapping
+                   :key-fn :id))
   (assert (= 100 (count (children container))))
-  
-  (unify! container (take 10 new-data) mapping
-          :key-fn :id)
+
+  (profile "UPDATE/EXIT node hiearchy"
+           (unify! container (take 10 new-data) mapping
+                   :key-fn :id))
   
   (assert (= 10 (count (children container))))
-  #_(assert (= (:val (first new-data))
-             (:val (read-attrs (first (children container))))))
-  
-
-  )
+  (assert (= (:val (first new-data))
+             (:val (read-attrs (first (children container)))))))
 
 
