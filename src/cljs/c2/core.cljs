@@ -2,9 +2,10 @@
   (:use-macros [c2.util :only [p timeout]]
                [clojure.core.match.js :only [match]]
                [iterate :only [iter]])
-  (:use [cljs.reader :only [read-string]])
+  (:use [cljs.reader :only [read-string]]
+        [c2.dom :only [children merge-dom! cannonicalize attr]])
   (:require [pinot.html :as html]
-            [pinot.dom :as dom]
+            [pinot.dom :as pdom]
             [goog.dom :as gdom]
             [clojure.set :as set]
             [clojure.string :as string]))
@@ -35,65 +36,6 @@
     ;;(.-outerHTML x)
     x))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;DOM manipulation & hiccup-like things
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defn children [node]
-  (filter #(= 1 (.-nodeType %))
-          (.-childNodes node)))
-
-;; From Weavejester's Hiccup.
-(def ^{:doc "Regular expression that parses a CSS-style id and class from a tag name."}
-  re-tag #"([^\s\.#]+)(?:#([^\s\.#]+))?(?:\.([^\s#]+))?")
-
-(defn merge-dom [dom-node el]
-  (when (not= (.toLowerCase (.-nodeName dom-node))
-              (.toLowerCase (name (:tag el))))
-    (throw "Cannot merge el into node of a different type"))
-
-  (dom/attr dom-node (:attr el))
-  (when-let [txt (first (filter string? (:children el)))]
-    (dom/text dom-node txt))
-  (iter {for [dom-child el-child] in (map vector (children dom-node)
-                                          (remove string? (:children el)))}
-        (merge-dom dom-child el-child)))
-
-
-(def xmlns {:xhtml "http://www.w3.org/1999/xhtml"
-            :svg "http://www.w3.org/2000/svg"})
-
-(defn cannonicalize
-  "Parse hiccup-like vec into map of {:tag :attr :children}, or return string as itself.
-   Based on Pinot's html/normalize-element."
-  [x]
-  (match [x]
-         [(str :when string?)] str
-         ;;todo, make explicit match here for attr map and clean up crazy Pinot logic below
-         [[tag & content]]   (let [[_ tag id class] (re-matches re-tag (name tag))
-                                   [nsp tag]     (let [[nsp t] (string/split tag #":")
-                                                       ns-xmlns (xmlns (keyword nsp))]
-                                                   (if t
-                                                     [(or ns-xmlns nsp) (keyword t)]
-                                                     [(:xhtml xmlns) (keyword nsp)]))
-                                   tag-attrs        (into {}
-                                                          (filter #(not (nil? (second %)))
-                                                                  {:id (or id nil)
-                                                                   :class (if class (string/replace class #"\." " "))}))
-                                   map-attrs        (first content)]
-
-                               (if (map? map-attrs)
-                                 {:tag  tag :attr (merge tag-attrs map-attrs) :children  (map cannonicalize (next content))}
-                                 {:tag tag :attr tag-attrs :children  (map cannonicalize content)}))))
-
-
-
-
-
-
-
-
-
 
 ;;Attach data in Clojure reader readable format to the DOM.
 ;;Use data-* attr rather than trying to set as a property.
@@ -112,7 +54,7 @@
             (binding [*print-dup* true] (pr-str d))))
 
 (defmethod attach-data :dom [node d]
-  (dom/attr node (str "data-" node-data-key)
+  (attr node (str "data-" node-data-key)
             (binding [*print-dup* true] (pr-str d))))
 
 (defmulti read-data (fn [node] (node-type node)))
@@ -205,15 +147,14 @@ Optional enter, update, and exit functions called before DOM is changed; return 
               (do
                 ;;append it (effectively moving it to the correct index in the container)
                 (gdom/appendChild container (:node old))
-
                 ;;If its data is not equal to the new data, update it
                 (if (not= d (:datum old))
                   (if (update d idx (:node old) new-node)
-                    (merge-dom (:node old) (cannonicalize new-node)))))
+                    (merge-dom! (:node old) (cannonicalize new-node)))))
               
               (let [new-dom-node (html/html new-node)]
                 (if (enter d idx new-dom-node)
-                  (dom/append container new-dom-node))))))
+                  (pdom/append container new-dom-node))))))
 
     ;;Run post-fn, if it was given
     (if post-fn

@@ -1,24 +1,29 @@
 (ns c2.core-test
   (:use-macros [helpers :only [p profile]])
-  (:use [c2.core :only [unify! children]]))
+  (:use [c2.core :only [unify!]]
+        [c2.dom :only [attr children]]))
 
 (defn *print-fn* [x]
   (.log js/console x))
 
 (def xhtml "http://www.w3.org/1999/xhtml")
 
-(defn read-attrs [el]
-  (let [attrs (.-attributes el)]
-    (into {} (for [i (range (.-length attrs))]
-               [(keyword  (.-name (aget attrs i)))
-                (.-value (aget attrs i))]))))
-
-
 (def container (.createElementNS js/document xhtml "div"))
 ;;Appending to html instead of body here because of PhantomJS page.injectJs() wonky behavior
 (.appendChild (.querySelector js/document "html") container)
 
 (defn clear! [] (set! (.-innerHTML container) ""))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;Attribute reading & writing
+(assert (= nil (attr container :x)))
+(attr container :x 1)
+(assert (= "1" (attr container :x)))
+(attr container {:y 2 :z 3})
+(assert (= {:x "1" :y "2" :z "3"} (attr container)))
+
+
 
 (print "\n\nSingle node enter/update/exit\n=============================")
 (let [n 100
@@ -27,22 +32,19 @@
   (profile (str "ENTER single tag with " n " data")
            (unify! container (range n) mapping))
   (let [children (children container)
-        fel       (first children)
-        attrs     (read-attrs fel)]
-
+        fel       (first children)]
     (assert (= n (count children)))
     (assert (= "span" (.toLowerCase (.-nodeName fel))))
-    (assert (= "0" (:x attrs))))
+    (assert (= "0" (:x (attr fel)))))
 
 
   (profile (str "UPDATE single tag, reversing order")
            (unify! container (reverse (range n)) mapping))
   (let [children (children container)
-        fel       (first children)
-        attrs     (read-attrs fel)]
+        fel       (first children)]
     (assert (= n (count children)))
     (assert (= "span" (.toLowerCase (.-nodeName fel))))
-    (assert (= (str (dec n)) (:x attrs))))
+    (assert (= (str (dec n)) (:x (attr fel)))))
 
   
   (profile (str "UPDATE single tag with new datum")
@@ -76,6 +78,8 @@
   
   (assert (= 10 (count (children container))))
   (assert (= (:val (first new-data))
-             (:val (read-attrs (first (children container)))))))
+             (:val (attr (first (children container)))))))
 
 
+
+(print "\n\nHurray, no errors!")
