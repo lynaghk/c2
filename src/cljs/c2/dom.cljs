@@ -16,6 +16,9 @@
   (filter #(= 1 (.-nodeType %))
           (.-childNodes node)))
 
+(defn dom-element? [x]
+  (not (nil? (.-nodeName x))))
+
 (defn attr
   ([el] (let [attrs (.-attributes el)]
           (into {} (for [i (range (.-length attrs))]
@@ -26,8 +29,18 @@
                  [(m :when map?)] (doseq [[k v] m] (attr el k v))))
   ([el k v] (.setAttribute el (name k) v)))
 
+
+(defn style []
+  ;;todo
+  )
+
 (defn text [el v]
   (gdom/setTextContent el v))
+
+
+
+
+
 
 (defn merge-dom! [dom-node el]
   (when (not= (.toLowerCase (.-nodeName dom-node))
@@ -61,5 +74,17 @@
                                    map-attrs        (first content)]
 
                                (if (map? map-attrs)
-                                 {:tag  tag :attr (merge tag-attrs map-attrs) :children  (map cannonicalize (next content))}
-                                 {:tag tag :attr tag-attrs :children  (map cannonicalize content)}))))
+                                 {:nsp nsp :tag tag :attr (merge tag-attrs map-attrs) :children  (map cannonicalize (next content))}
+                                 {:nsp nsp :tag tag :attr tag-attrs :children  (map cannonicalize content)}))))
+
+(defn create-elem [nsp tag]
+  (.createElementNS js/document nsp tag))
+
+(defn build-dom-elem [el-vec]
+  (let [{:keys [nsp tag children] :as elm} (cannonicalize el-vec)
+        elem (create-elem nsp tag)]
+    (attr elem (:attr elm))
+    (doseq [c (map build-dom-elem children)]
+      (when c
+        (gdom/appendChild elem c)))
+    elem))

@@ -15,15 +15,6 @@
 (defn clear! [] (set! (.-innerHTML container) ""))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;Attribute reading & writing
-(assert (= nil (attr container :x)))
-(attr container :x 1)
-(assert (= "1" (attr container :x)))
-(attr container {:y 2 :z 3})
-(assert (= {:x "1" :y "2" :z "3"} (attr container)))
-
-
 
 (print "\n\nSingle node enter/update/exit\n=============================")
 (let [n 100
