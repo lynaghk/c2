@@ -78,13 +78,17 @@
                                  {:nsp nsp :tag tag :attr tag-attrs :children  (map cannonicalize content)}))))
 
 (defn create-elem [nsp tag]
-  (.createElementNS js/document nsp tag))
+  (.createElementNS js/document nsp (name tag)))
 
-(defn build-dom-elem [el-vec]
-  (let [{:keys [nsp tag children] :as elm} (cannonicalize el-vec)
-        elem (create-elem nsp tag)]
-    (attr elem (:attr elm))
-    (doseq [c (map build-dom-elem children)]
-      (when c
-        (gdom/appendChild elem c)))
-    elem))
+(defn build-dom-elem [el]
+  (match [el]
+         [(s :when string?)] (gdom/createTextNode s)
+         [(v :when vector?)] (recur (cannonicalize v))
+         [(m :when map?)] ;;Can't use {:keys [...]} destructuring in place of m in this clause. Why?
+         (let [{:keys [nsp tag children] :as elm} m
+               elem (create-elem nsp tag)]
+           (attr elem (:attr elm))
+           (doseq [c (map build-dom-elem children)]
+             (when c
+               (gdom/appendChild elem c)))
+           elem)))

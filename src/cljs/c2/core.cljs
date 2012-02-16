@@ -1,12 +1,9 @@
 (ns c2.core
   (:use-macros [c2.util :only [p timeout]]
-               [clojure.core.match.js :only [match]]
                [iterate :only [iter]])
   (:use [cljs.reader :only [read-string]]
-        [c2.dom :only [children merge-dom! cannonicalize attr]])
-  (:require [pinot.html :as html]
-            [pinot.dom :as pdom]
-            [goog.dom :as gdom]
+        [c2.dom :only [children build-dom-elem merge-dom! cannonicalize attr]])
+  (:require [goog.dom :as gdom]
             [clojure.set :as set]
             [clojure.string :as string]))
 
@@ -55,7 +52,7 @@
 
 (defmethod attach-data :dom [node d]
   (attr node (str "data-" node-data-key)
-            (binding [*print-dup* true] (pr-str d))))
+        (binding [*print-dup* true] (pr-str d))))
 
 (defmulti read-data (fn [node] (node-type node)))
 (defmethod read-data :hiccup [node] (get-in node [1 (str "data-" node-data-key)]))
@@ -151,10 +148,10 @@ Optional enter, update, and exit functions called before DOM is changed; return 
                 (if (not= d (:datum old))
                   (if (update d idx (:node old) new-node)
                     (merge-dom! (:node old) (cannonicalize new-node)))))
-              
-              (let [new-dom-node (html/html new-node)]
+
+              (let [new-dom-node (build-dom-elem new-node)]
                 (if (enter d idx new-dom-node)
-                  (pdom/append container new-dom-node))))))
+                  (gdom/appendChild container new-dom-node))))))
 
     ;;Run post-fn, if it was given
     (if post-fn
