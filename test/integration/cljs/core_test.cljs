@@ -1,5 +1,6 @@
 (ns c2.core-test
   (:use-macros [helpers :only [p profile]])
+  (:require [c2.svg :as svg])
   (:use [c2.core :only [unify!]]
         [c2.dom :only [attr children]]))
 
@@ -9,10 +10,14 @@
 (def xhtml "http://www.w3.org/1999/xhtml")
 
 (def container (.createElementNS js/document xhtml "div"))
+(def svg-container (.createElementNS js/document "http://www.w3.org/2000/svg" "svg"))
 ;;Appending to html instead of body here because of PhantomJS page.injectJs() wonky behavior
 (.appendChild (.querySelector js/document "html") container)
+(.appendChild (.querySelector js/document "html") svg-container)
 
-(defn clear! [] (set! (.-innerHTML container) ""))
+(defn clear! []
+  (set! (.-innerHTML container) "")
+  (set! (.-innerHTML svg-container) ""))
 
 
 
@@ -71,6 +76,12 @@
   (assert (= (:val (first new-data))
              (:val (attr (first (children container)))))))
 
+(clear!)
 
+
+;;Axis component
+(let [s #(* 10 %)]
+  (svg/axis svg-container s
+            :ticks [1 2 3]))
 
 (print "\n\nHurray, no errors!")
