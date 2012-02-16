@@ -5,5 +5,6 @@
   (sh "mkdir" "-p" js-base)
   (closure/build "src/cljs" {:optimizations :whitespace
                              :externs ["vendor/externs.js"]
+                             :lib ["cassowaryjs"]
                              :output-to (str js-base "/main.js") 
                              :output-dir (str js-base "/out")}))

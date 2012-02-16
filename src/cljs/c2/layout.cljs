@@ -2,7 +2,7 @@
   (:refer-clojure :exclude [+ - =])
   (:use-macros [c2.util :only [p half]])
   (:use [c2.core :only [translate children select select-all]]
-        [c2.cassowary :only [+ - = cvar constrain! stay! simplex-solver]])
+        [cassowary.core :only [+ - = cvar constrain! stay! simplex-solver]])
   (:require [pinot.dom :as dom]))
 
 (defn distribute! [selector]

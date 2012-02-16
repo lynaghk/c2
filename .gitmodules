@@ -4,6 +4,3 @@
 [submodule "vendor/pinot"]
 	path = vendor/pinot
 	url = git://github.com/lynaghk/pinot
-[submodule "vendor/cassowary-coffee"]
-	path = vendor/cassowary-coffee
-	url = git://github.com/lynaghk/cassowary-coffee
