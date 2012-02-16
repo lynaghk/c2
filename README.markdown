@@ -44,6 +44,6 @@ Testing
 
 Use PhantomJS with highly advanced "list-of-assertions" testing framework:
 
-    cake run script/compile_tests.clj && phantomjs test/integration/runner.js
+    cake run script/compile_tests.clj && phantomjs test/integration/runner.coffee
 
 or, if you're too cool to go headless, open up `test/integration/runner.html` in your browser.
