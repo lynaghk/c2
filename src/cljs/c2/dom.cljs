@@ -16,8 +16,35 @@
   (filter #(= 1 (.-nodeType %))
           (.-childNodes node)))
 
+
+
 (defn dom-element? [x]
-  (not (nil? (.-nodeName x))))
+  (not (undefined? (.-nodeName x))))
+
+(defn node-type [node]
+  (cond
+   (vector? node)      :hiccup   ;;Hiccup vector
+   (string? node)      :selector ;;CSS selector string
+   (dom-element? node) :dom      ;;It's an actual DOM node
+   ))
+
+
+
+(defmulti select node-type)
+(defmethod select :selector
+  ([selector] (first (gdom/query selector)))
+  ([selector container] (first (gdom/query selector container))))
+(defmethod select :dom [node] node)
+
+(defmulti select-all node-type)
+(defmethod select-all :selector [selector] (gdom/query selector))
+(defmethod select-all :dom [nodes] nodes)
+
+
+(defn append! [container el]
+  (if (dom-element? el)
+    (gdom/appendChild container el)
+    (recur container (build-dom-elem el))))
 
 (defn attr
   ([el] (let [attrs (.-attributes el)]
@@ -39,20 +66,21 @@
 
 
 
+(defn merge-dom!
+  "Walks an existing dom-node and makes sure that it has the same attributes and children as the given el."
+  [dom-node el]
+  (let [el (cannonicalize el)]
+    (when (not= (.toLowerCase (.-nodeName dom-node))
+                (.toLowerCase (name (:tag el))))
+      (throw "Cannot merge el into node of a different type"))
 
-
-
-(defn merge-dom! [dom-node el]
-  (when (not= (.toLowerCase (.-nodeName dom-node))
-              (.toLowerCase (name (:tag el))))
-    (throw "Cannot merge el into node of a different type"))
-
-  (attr dom-node (:attr el))
-  (when-let [txt (first (filter string? (:children el)))]
-    (text dom-node txt))
-  (iter {for [dom-child el-child] in (map vector (children dom-node)
-                                          (remove string? (:children el)))}
-        (merge-dom! dom-child el-child)))
+    (attr dom-node (:attr el))
+    
+    (when-let [txt (first (filter string? (:children el)))]
+      (text dom-node txt))
+    (iter {for [dom-child el-child] in (map vector (children dom-node)
+                                            (remove string? (:children el)))}
+          (merge-dom! dom-child el-child))))
 
 (defn cannonicalize
   "Parse hiccup-like vec into map of {:tag :attr :children}, or return string as itself.
@@ -60,6 +88,7 @@
   [x]
   (match [x]
          [(str :when string?)] str
+         [(m   :when map?)] m ;;todo, actually check to make sure map has nsp, tag, attr, and children keys
          ;;todo, make explicit match here for attr map and clean up crazy Pinot logic below
          [[tag & content]]   (let [[_ tag id class] (re-matches re-tag (name tag))
                                    [nsp tag]     (let [[nsp t] (string/split tag #":")
@@ -90,5 +119,5 @@
            (attr elem (:attr elm))
            (doseq [c (map build-dom-elem children)]
              (when c
-               (gdom/appendChild elem c)))
+               (append! elem c)))
            elem)))

@@ -2,7 +2,7 @@
   (:use-macros [c2.util :only [p timeout]]
                [iterate :only [iter]])
   (:use [cljs.reader :only [read-string]]
-        [c2.dom :only [children build-dom-elem merge-dom! cannonicalize attr]])
+        [c2.dom :only [select node-type append! children build-dom-elem merge-dom! attr]])
   (:require [goog.dom :as gdom]
             [clojure.set :as set]
             [clojure.string :as string]))
@@ -39,12 +39,6 @@
 ;;See http://dev.w3.org/html5/spec/Overview.html#attr-data
 (def node-data-key "c2")
 
-(defn node-type [node]
-  (cond
-   (vector? node) :hiccup   ;;Hiccup vector
-   (string? node) :selector ;;CSS selector string
-   :else          :dom      ;;It's an actual DOM node
-   ))
 (defmulti attach-data (fn [node d] (node-type node)))
 (defmethod attach-data :hiccup [node d]
   (assoc-in node [1 (str "data-" node-data-key)]
@@ -76,13 +70,6 @@
 
 
 
-(defmulti select node-type)
-(defmethod select :selector [selector] (first (gdom/query selector)))
-(defmethod select :dom [node] node)
-
-(defmulti select-all node-type)
-(defmethod select-all :selector [selector] (gdom/query selector))
-(defmethod select-all :dom [nodes] nodes)
 
 (defn unify!
   "Calls (mapping datum idx) for each datum and appends resulting elements to container.
@@ -135,7 +122,7 @@ Optional enter, update, and exit functions called before DOM is changed; return 
             (if (exit datum idx node)
               (gdom/removeNode node))))
 
-
+    
     ;;For each datum, update existing nodes and add new ones
     (iter {for [idx d] in (map-indexed vector data)}
           (let [new-node (attach-data (mapping d idx) d)]
@@ -143,15 +130,14 @@ Optional enter, update, and exit functions called before DOM is changed; return 
             (if-let [old (existing-nodes-by-key (key-fn d idx))]
               (do
                 ;;append it (effectively moving it to the correct index in the container)
-                (gdom/appendChild container (:node old))
+                (append! container (:node old))
                 ;;If its data is not equal to the new data, update it
                 (if (not= d (:datum old))
                   (if (update d idx (:node old) new-node)
-                    (merge-dom! (:node old) (cannonicalize new-node)))))
+                    (merge-dom! (:node old) new-node))))
 
-              (let [new-dom-node (build-dom-elem new-node)]
-                (if (enter d idx new-dom-node)
-                  (gdom/appendChild container new-dom-node))))))
+              (if (enter d idx new-dom-node)
+                (append! container new-node)))))
 
     ;;Run post-fn, if it was given
     (if post-fn
