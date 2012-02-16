@@ -12,11 +12,6 @@
 (def xmlns {:xhtml "http://www.w3.org/1999/xhtml"
             :svg "http://www.w3.org/2000/svg"})
 
-(defn children [node]
-  (filter #(= 1 (.-nodeType %))
-          (.-childNodes node)))
-
-
 
 (defn dom-element? [x]
   (not (undefined? (.-nodeName x))))
@@ -28,8 +23,6 @@
    (dom-element? node) :dom      ;;It's an actual DOM node
    ))
 
-
-
 (defmulti select node-type)
 (defmethod select :selector
   ([selector] (first (gdom/query selector)))
@@ -39,6 +32,17 @@
 (defmulti select-all node-type)
 (defmethod select-all :selector [selector] (gdom/query selector))
 (defmethod select-all :dom [nodes] nodes)
+
+
+
+(defn children [node]
+  (filter #(= 1 (.-nodeType %))
+          (.-childNodes (select node))))
+
+(defn parent [node]
+  (.parentNode (select node)))
+
+
 
 
 (defn append! [container el]
