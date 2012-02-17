@@ -7,6 +7,10 @@
   `(do (.log js/console ~x)
        ~x))
 
+(defmacro pp [x]
+  `(do (.log js/console (pr-str ~x))
+       ~x))
+
 (defmacro timeout [delay f] `(js/setTimeout ~f ~delay))
 (defmacro interval [delay f] `(js/setInterval ~f ~delay))
 (defmacro half [x] `(/ ~x 2))
