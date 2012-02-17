@@ -48,10 +48,11 @@
 
 
 (defn append! [container el]
-  (gdom/appendChild (select container)
-                    (if (dom-element? el)
-                      el
-                      (build-dom-elem el))))
+  (let [el (if (dom-element? el)
+             el
+             (build-dom-elem el))]
+    (gdom/appendChild (select container) el)
+    el))
 
 
 (defn attr
@@ -83,7 +84,7 @@
       (throw "Cannot merge el into node of a different type"))
 
     (attr dom-node (:attr el))
-    
+
     (when-let [txt (first (filter string? (:children el)))]
       (text dom-node txt))
     (iter {for [dom-child el-child] in (map vector (children dom-node)
