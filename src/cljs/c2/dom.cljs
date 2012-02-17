@@ -25,12 +25,14 @@
 
 (defmulti select node-type)
 (defmethod select :selector
-  ([selector] (first (gdom/query selector)))
-  ([selector container] (first (gdom/query selector container))))
+  ([selector] (.querySelector js/document selector))
+  ([selector container] (.querySelector (select container) selector)))
 (defmethod select :dom [node] node)
 
 (defmulti select-all node-type)
-(defmethod select-all :selector [selector] (gdom/query selector))
+(defmethod select-all :selector
+  ([selector] (.querySelectorAll js/document selector))
+  ([selector container] (.querySelectorAll (select container) selector)))
 (defmethod select-all :dom [nodes] nodes)
 
 
@@ -46,9 +48,11 @@
 
 
 (defn append! [container el]
-  (if (dom-element? el)
-    (gdom/appendChild container el)
-    (recur container (build-dom-elem el))))
+  (gdom/appendChild (select container)
+                    (if (dom-element? el)
+                      el
+                      (build-dom-elem el))))
+
 
 (defn attr
   ([el] (let [attrs (.-attributes el)]
