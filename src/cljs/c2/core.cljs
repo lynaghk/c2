@@ -133,7 +133,8 @@ Optional enter, update, and exit functions called before DOM is changed; return 
                 ;;If its data is not equal to the new data, update it
                 (if (not= d (:datum old))
                   (if (update d idx (:node old) new-node)
-                    (merge-dom! (:node old) new-node))))
+                    (merge-dom! (:node old) new-node
+                                :defer-attr true))))
 
               (if (enter d idx new-dom-node)
                 (append! container new-node)))))

@@ -48,7 +48,6 @@
 
 
 
-
 (defn append! [container el]
   (let [el (if (dom-element? el)
              el
@@ -80,23 +79,28 @@
 (defn text [el v]
   (gdom/setTextContent el v))
 
-
+(defn request-animation-frame
+  ([cb] (.webkitRequestAnimationFrame js/window cb))
+  ([cb el] (.webkitRequestAnimationFrame js/window cb el)))
 
 (defn merge-dom!
   "Walks an existing dom-node and makes sure that it has the same attributes and children as the given el."
-  [dom-node el]
+  [dom-node el & {:keys [defer-attr]
+                  :or {defer-attr false}}]
   (let [el (cannonicalize el)]
     (when (not= (.toLowerCase (.-nodeName dom-node))
                 (.toLowerCase (name (:tag el))))
       (throw "Cannot merge el into node of a different type"))
-
-    (attr dom-node (:attr el))
+    
+    (if defer-attr
+      (request-animation-frame #(attr dom-node (:attr el)) dom-node)
+      (attr dom-node (:attr el)))
 
     (when-let [txt (first (filter string? (:children el)))]
       (text dom-node txt))
     (iter {for [dom-child el-child] in (map vector (children dom-node)
                                             (remove string? (:children el)))}
-          (merge-dom! dom-child el-child))))
+          (merge-dom! dom-child el-child :defer-attr defer-attr))))
 
 (defn cannonicalize
   "Parse hiccup-like vec into map of {:tag :attr :children}, or return string as itself.
