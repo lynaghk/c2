@@ -2,7 +2,7 @@
   (:use-macros [c2.util :only [p timeout]]
                [iterate :only [iter]])
   (:use [cljs.reader :only [read-string]]
-        [c2.dom :only [select node-type append! children build-dom-elem merge-dom! attr]])
+        [c2.dom :only [select node-type append! children build-dom-elem merge-dom! attr cannonicalize]])
   (:require [goog.dom :as gdom]
             [clojure.set :as set]
             [clojure.string :as string]))
@@ -33,23 +33,22 @@
     ;;(.-outerHTML x)
     x))
 
-
 ;;Attach data in Clojure reader readable format to the DOM.
 ;;Use data-* attr rather than trying to set as a property.
 ;;See http://dev.w3.org/html5/spec/Overview.html#attr-data
 (def node-data-key "c2")
-
 (defmulti attach-data (fn [node d] (node-type node)))
-(defmethod attach-data :hiccup [node d]
-  (assoc-in node [1 (str "data-" node-data-key)]
-            (binding [*print-dup* true] (pr-str d))))
+(defmethod attach-data :chiccup [node d]
+  (assoc-in node [:attr (str "data-" node-data-key)]
+              (binding [*print-dup* true] (pr-str d))))
 
 (defmethod attach-data :dom [node d]
   (attr node (str "data-" node-data-key)
         (binding [*print-dup* true] (pr-str d))))
 
 (defmulti read-data (fn [node] (node-type node)))
-(defmethod read-data :hiccup [node] (get-in node [1 (str "data-" node-data-key)]))
+(defmethod read-data :chiccup [node]
+  (read-string (get-in node [:attr (str "data-" node-data-key)])))
 (defmethod read-data :dom [node]
   (if-let [data-str (aget (.-dataset node)
                           node-data-key)]
@@ -125,7 +124,7 @@ Optional enter, update, and exit functions called before DOM is changed; return 
     
     ;;For each datum, update existing nodes and add new ones
     (iter {for [idx d] in (map-indexed vector data)}
-          (let [new-node (attach-data (mapping d idx) d)]
+          (let [new-node (attach-data (cannonicalize (mapping d idx)) d)]
             ;;If there's an existing node
             (if-let [old (existing-nodes-by-key (key-fn d idx))]
               (do

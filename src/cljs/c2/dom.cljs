@@ -19,6 +19,7 @@
 (defn node-type [node]
   (cond
    (vector? node)      :hiccup   ;;Hiccup vector
+   (map? node)         :chiccup  ;;Hiccup map representation
    (string? node)      :selector ;;CSS selector string
    (dom-element? node) :dom      ;;It's an actual DOM node
    ))
