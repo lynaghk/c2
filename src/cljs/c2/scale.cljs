@@ -3,13 +3,21 @@
 (defn linear [& {:keys [domain range]
                  :or {domain [0 1]
                       range  [0 1]}}]
-  (let [domain-length (- (last domain) (first domain))
-        range-length (- (last range) (first range))]
-    (fn [x]
-      (+ (first range)
-         (* range-length
-            (/ (- x (first domain))
-               domain-length))))))
+  
+  ;;Special arguments; what is this? RUBY!?!
+  ;;Terrible idea?
+  (if (= range :percent)
+    #(str
+      (apply (linear :domain domain :range [0 100]) %&)
+      "%")
+    
+    (let [domain-length (- (last domain) (first domain))
+          range-length (- (last range) (first range))]
+      (fn [x]
+        (+ (first range)
+           (* range-length
+              (/ (- x (first domain))
+                 domain-length)))))))
 
 
 (defn log [& {:keys [domain range]
