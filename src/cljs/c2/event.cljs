@@ -11,7 +11,7 @@
   (.listen goog.events js/window goog.events.EventType.LOAD f))
 
 (defn on-raw [node event-type f]
-  (gevents/listen node (name event-type) f))
+  (gevents/listen (dom/select node) (name event-type) f))
 
 (defn on
   ([node event-type f] (on node "*" event-type f))
