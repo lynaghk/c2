@@ -3,7 +3,8 @@
                [clojure.core.match.js :only [match]]
                [iterate :only [iter]])
   (:require [clojure.string :as string]
-            [goog.dom :as gdom]))
+            [goog.dom :as gdom]
+            [goog.style :as gstyle]))
 
 ;; From Weavejester's Hiccup.
 (def ^{:doc "Regular expression that parses a CSS-style id and class from a tag name."}
@@ -64,12 +65,17 @@
   ([el x] (match [x]
                  [(k :when keyword?)] (.getAttribute el (name k))
                  [(m :when map?)] (doseq [[k v] m] (attr el k v))))
-  ([el k v] (.setAttribute el (name k) v)))
+  ([el k v]
+     (if (= :style k)
+       (style el v)
+       (.setAttribute el (name k) v))))
 
-
-(defn style []
-  ;;todo
-  )
+(defn style
+  ([el] (throw (js/Error. "TODO: return map of element styles")))
+  ([el x] (match [x]
+                 [(k :when keyword?)] (gstyle/getStyle el (name k))
+                 [(m :when map?)] (doseq [[k v] m] (style el k v))))
+  ([el k v] (gstyle/setStyle el (name k) v)))
 
 (defn text [el v]
   (gdom/setTextContent el v))
