@@ -2,7 +2,7 @@
   (:use [clojure.core.match :only [match]]
         [clojure.string :only [join]]))
 
-(defn geo-to-svg
+(defn geo->svg
   "Convert geoJSON to svg path data. Takes optional projection, defaulting to identity"
   [geo & {:keys [projection]
           :or {projection identity}}]
@@ -28,4 +28,6 @@
          ;;It'd be nice to recurse to the actual branch that handles Polygon, instead of repeating...
          (join (map (fn [subpoly]
                       (join (map coords->path subpoly)))
-                    xs))))
+                    xs))
+
+         :else ""))
