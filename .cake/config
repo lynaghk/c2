@@ -1,6 +1,3 @@
 project.classpath = src/cljs\
 :src/clj\
-:test/integration/\
-:vendor/clojurescript/src/clj\
-:vendor/clojurescript/src/cljs\
-:vendor/pinot/src
+:test/integration/

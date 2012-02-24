@@ -1,10 +1,10 @@
 (defproject c2 "0.0.1-SNAPSHOT"
   :description "Declarative data visualization in Clojure(Script)."
   :dependencies [[org.clojure/clojure "1.3.0"]
-                 [com.google.javascript/closure-compiler "r1592"]
+                 [org.clojure/clojurescript "0.0-927"]
+                 
                  [com.keminglabs/cassowary "0.1.0"]
                  
-                 [goog-jar "1.0.0"] ;;Required for C2 because of its Pinot submodule dependency; will drop when new Pinot JAR is cut or C2 stops using Pinot all together.
                  [org.clojure/core.match "0.2.0-alpha9"]
                  [clj-iterate "0.95-SNAPSHOT"]]
   

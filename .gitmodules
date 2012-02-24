@@ -1,6 +1,0 @@
-[submodule "vendor/clojurescript"]
-	path = vendor/clojurescript
-	url = git://github.com/clojure/clojurescript
-[submodule "vendor/pinot"]
-	path = vendor/pinot
-	url = git://github.com/lynaghk/pinot
