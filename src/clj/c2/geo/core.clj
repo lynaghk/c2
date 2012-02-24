@@ -17,24 +17,15 @@
   ;;This SVG rendering doesn't implement the full spec.
   (match [geo]
          [{:type "FeatureCollection" :features xs}]
-         (join "" (map geo-to-svg xs))
+         (join (map geo-to-svg xs))
 
          [{:type "Feature" :geometry g}] (geo-to-svg g)
 
          [{:type "Polygon" :coordinates xs}]
-         (join "" (map coords->path xs))
+         (join (map coords->path xs))
 
          [{:type "MultiPolygon" :coordinates xs}]
          ;;It'd be nice to recurse to the actual branch that handles Polygon, instead of repeating...
-         (join "" (map (fn [subpoly]
-                                (join "" (map coords->path subpoly)))
-                              xs))
-
-         #_(comment TODO
-                    [{:type "Point"}]
-                    [{:type "MultiPoint"}]
-                    [{:type "LineString"}]
-                    [{:type "MultiLineString"}]
-                    [{:type "GeometryCollection"}])
-
-         ))
+         (join (map (fn [subpoly]
+                      (join (map coords->path subpoly)))
+                    xs))))
