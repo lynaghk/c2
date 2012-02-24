@@ -134,7 +134,10 @@ Optional enter, update, and exit functions called before DOM is changed; return 
                 (if (not= d (:datum old))
                   (if (update d idx (:node old) new-node)
                     (merge-dom! (:node old) new-node
-                                :defer-attr true))))
+                                
+                                ;;don't use requestAnimationFrame until we can figure out how to get it playing nicely with automated tests.
+                                ;;:defer-attr true
+                                ))))
 
               (if (enter d idx new-dom-node)
                 (append! container new-node)))))
