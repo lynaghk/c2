@@ -17,9 +17,9 @@
   ;;This SVG rendering doesn't implement the full spec.
   (match [geo]
          [{:type "FeatureCollection" :features xs}]
-         (join (map geo-to-svg xs))
+         (join (map #(geo->svg % :projection projection) xs))
 
-         [{:type "Feature" :geometry g}] (geo-to-svg g)
+         [{:type "Feature" :geometry g}] (geo->svg g :projection projection)
 
          [{:type "Polygon" :coordinates xs}]
          (join (map coords->path xs))
