@@ -1,5 +1,5 @@
 (ns c2.dom
-  (:use-macros [c2.util :only [p]]
+  (:use-macros [c2.util :only [p timeout]]
                [clojure.core.match.js :only [match]]
                [iterate :only [iter]])
   (:require [clojure.string :as string]
@@ -79,9 +79,10 @@
 (defn text [el v]
   (gdom/setTextContent el v))
 
-(defn request-animation-frame
-  ([cb] (.webkitRequestAnimationFrame js/window cb))
-  ([cb el] (.webkitRequestAnimationFrame js/window cb el)))
+(def request-animation-frame
+  (or (.-requestAnimationFrame js/window)
+      (.-webkitRequestAnimationFrame js/window)
+      #(timeout 10 %)))
 
 (defn merge-dom!
   "Walks an existing dom-node and makes sure that it has the same attributes and children as the given el."
