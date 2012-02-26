@@ -4,6 +4,15 @@
         [c2.util :only [f-c]]))
 
 (def ArcMax (- (* 2 Pi) 0.0000001))
+
+(defn circle
+  "Returns svg path data for a circle starting at 3 o'clock and sweeping in positive y."
+  ([radius] (circle [0 0] radius))
+  ([[x y] radius]
+     (str "M"  (+ x radius) "," y
+          "A" (+ x radius) "," (+ y radius) " 0 1,1" (- (+ x radius)) "," y
+          "A" (+ x radius) "," (+ y radius) " 0 1,1" (+ x radius) "," y)))
+
 (defn arc
   "Returns fn(d, idx) -> SVG arc path string. Parameters can be constants or fn(d, idx)."
   [& {:keys [inner-radius, outer-radius

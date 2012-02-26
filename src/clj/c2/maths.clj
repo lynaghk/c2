@@ -14,6 +14,10 @@
   ([x y] (Math/pow x y)))
 (defn sqrt [x] (Math/sqrt x))
 
+
+(defn percentage [x y]
+  (str (* 100 (/ x y)) "%"))
+
 ;;CLJS!
 (comment
   (def sin (.-sin js/Math))
