@@ -1,5 +1,5 @@
-Just a file of lil' notes to myself.
-
+Todo
+====
 
 Find a nice way to include useful data like US state geo data without blowing up the repo size.
 
@@ -21,6 +21,9 @@ Implement scales, &c. as "objects":
     (s 25) ;=> 0.5
     (:domain s) ;=> [0 50]
 
-  
 
+Design decisions
+================
 
+Should thing like svg.arc be higher order functions (as in D3), or just work as basic utilities?
+The latter is simpler, and I'm not convinced of the advantages of defining things like arc helpers away from where they'll be used.

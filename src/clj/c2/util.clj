@@ -26,3 +26,10 @@ Currently, there is no arity-checking on ClojureScript anon functions, so this i
               (catch clojure.lang.ArityException e (dont-carity f))))
   ([f a b] (try (f a b)
                 (catch clojure.lang.ArityException e (dont-carity f a)))))
+
+(defn f-c
+  "Call f with args if it implement IFn, otherwise just return f. Useful to let people pass in fns or constants to some helpers."
+  [f & args]
+  (if (ifn? f)
+    (apply f args)
+    f))
