@@ -1,4 +1,5 @@
-(ns c2.layout.partition)
+(ns c2.layout.partition
+  (:refer-clojure :exclude [partition]))
 
 
 (defn partition [root & {:keys [sort children value size output-key]
