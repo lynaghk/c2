@@ -7,6 +7,7 @@
                  
                  [org.clojure/core.match "0.2.0-alpha9"]
                  [clj-iterate "0.95-SNAPSHOT"]]
-  :dev-dependencies [[midje "1.3.1"]]
+  :dev-dependencies [[midje "1.3.1"]
+                     [lein-midje "1.0.8"]]
   
   :source-path "src/clj")

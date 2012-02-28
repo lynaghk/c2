@@ -1,4 +1,4 @@
-(ns helpers)
+(ns integration.helpers)
 
 (defmacro p [x]
   `(do (.log js/console ~x)
