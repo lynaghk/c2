@@ -1,6 +1,8 @@
 (ns c2.geo.core
   (:use [clojure.core.match :only [match]]
-        [clojure.string :only [join]]))
+        [clojure.string :only [join]]
+        [c2.maths :only [abs]])
+  (:require c2.geom.polygon))
 
 (defn geo->svg
   "Convert geoJSON to svg path data. Takes optional projection, defaulting to identity"
@@ -31,3 +33,31 @@
                     xs))
 
          :else ""))
+
+
+
+(defn area [geo & {:keys [projection]
+                   :or {projection identity}}]
+
+  (defn polygon-area [poly-coordinates]
+    (let [area (fn [coordinates]
+                 (abs (c2.geom.polygon/area (map projection coordinates))))]
+      
+      ;;area of exterior boundary - interior holes
+      (apply - (area (first poly-coordinates)) 
+             (map area (rest poly-coordinates)))))
+
+  (abs (match [geo]
+              [{:type "FeatureCollection" :features xs}]
+              (apply + (map area xs))
+
+              [{:type "Feature" :geometry g}]
+              (area g)
+
+              [{:type "Polygon" :coordinates xs}]
+              (polygon-area xs)
+
+              [{:type "MultiPolygon" :coordinates xs}]
+              (apply + (map polygon-area xs))
+
+              :else 0)))

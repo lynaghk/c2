@@ -13,6 +13,7 @@
   ([x] (Math/exp x))
   ([x y] (Math/pow x y)))
 (defn sqrt [x] (Math/sqrt x))
+(defn abs [x] (Math/abs x))
 
 
 (defn percentage [x y]
