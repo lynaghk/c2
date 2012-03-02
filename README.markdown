@@ -20,8 +20,15 @@ We have no idea what's going on, and we're going to break a lot of stuff figurin
 Stable 1.0 release planned for April 2012.
 
 
-Experimentation / Development
-=============================
+
+Play around
+===========
+
+See `vrepl/README.markdown` for instructions on using the built-in examples+interactive-development server.
+
+
+Development
+===========
 
 If you want to work on c2 itself or just want a sandbox to play in, this repository has everything you need.
 First run
