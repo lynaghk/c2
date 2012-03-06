@@ -1,7 +1,6 @@
 (ns c2.svg
   (:use [c2.maths :only [Pi Tau radians-per-degree
-                         sin cos]]
-        [c2.util :only [f-c]]))
+                         sin cos]]))
 
 (def ArcMax (- (* 2 Pi) 0.0000001))
 
