@@ -15,6 +15,10 @@
 (defmacro interval [delay f] `(js/setInterval ~f ~delay))
 (defmacro half [x] `(/ ~x 2))
 
+(defn mapply
+  "Useful for invoking functions with keyword args"
+  [f m]
+  (apply f (apply concat m)))
 
 
 (defn dont-carity
