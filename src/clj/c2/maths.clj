@@ -14,7 +14,8 @@
   ([x y] (Math/pow x y)))
 (defn sqrt [x] (Math/sqrt x))
 (defn abs [x] (Math/abs x))
-
+(defn log [x] (Math/log x))
+(defn log10 [x] (Math/log10 x))
 
 (defn percentage [x y]
   (str (* 100 (/ x y)) "%"))
