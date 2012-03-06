@@ -21,6 +21,18 @@
   (apply f (apply concat m)))
 
 
+(defmacro c2-obj
+  "Macro that expands into reify with getters/setters for fields and Associative implementation that calls constructor with keyword args of fields."
+  [constructor iface fields & body]
+  `(reify
+     ~iface
+     ~@(concat (apply concat (for [f fields]
+                               (list `(~f [~'_] ~f)
+                                     `(~f [~'_ ~'x] (mapply ~constructor (assoc ~'args ~f ~'x))))))
+         `[clojure.lang.ILookup (~'valAt [~'_ ~'k] (~'args ~'k))
+           clojure.lang.Associative (~'assoc [~'_ ~'k ~'v] (mapply ~constructor (assoc ~'args ~'k ~'v)))]
+         body)))
+
 (defn dont-carity
   "Execute fn with args, catching wrong-arity errors and retrying with (butlast args).
 Currently, there is no arity-checking on ClojureScript anon functions, so this is a serverside prevention measure only."
