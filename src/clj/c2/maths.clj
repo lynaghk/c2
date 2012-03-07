@@ -17,10 +17,17 @@
 (defn log [x] (Math/log x))
 (defn log10 [x] (Math/log10 x))
 
+(defn floor [x] (Math/floor x))
+(defn ceil [x] (Math/ceil x))
+
 (defn percentage [x y]
   (str (* 100 (/ x y)) "%"))
 
-
+(defn extent
+  "Returns 2-vector of min and max elements in xs"
+  [xs]
+  [(apply min xs)
+   (apply max xs)])
 
 ;;element-by-element arithmetic
 ;;Code modified from Incanter
