@@ -22,6 +22,14 @@ Implement scales, &c. as "objects":
     (:domain s) ;=> [0 50]
 
 
+Visual REPL
+-----------
+
+Alert user on LiveReloadDisconnect
+Pretty stack traces
+
+
+
 Design decisions
 ================
 
