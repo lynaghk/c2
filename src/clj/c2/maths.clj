@@ -5,7 +5,7 @@
 (def Pi 3.141592653589793)
 (def Tau (* 2 Pi))
 (def radians-per-degree (/ Pi 180))
-
+(def Epsilon 1e-10)
 
 (defn sin [x] (Math/sin x))
 (defn cos [x] (Math/cos x))
@@ -13,6 +13,7 @@
   ([x] (Math/exp x))
   ([x y] (Math/pow x y)))
 (defn sqrt [x] (Math/sqrt x))
+(defmacro sq [x] `(expt ~x 2))
 (defn abs [x] (Math/abs x))
 (defn log [x] (Math/log x))
 (defn log10 [x] (Math/log10 x))
