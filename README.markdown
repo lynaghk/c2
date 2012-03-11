@@ -49,7 +49,14 @@ This repository includes a `.cake/config` with the appropriate paths.
 Testing
 =======
 
-Use PhantomJS with highly advanced "list-of-assertions" testing framework:
+Most of C2 is written in platform-agnostic Clojure and tested with Midje.
+Run
+
+    lein midje --autotest
+
+to start a test watcher, which will automatically reload namespaces and run tests when source or test files are changed.   
+
+For ClojureScript-specific integration testing, use our highly advanced, PhantomJS-powered "list-of-assertions" testing framework:
 
     cake run script/compile_tests.clj && phantomjs test/integration/runner.coffee
 
