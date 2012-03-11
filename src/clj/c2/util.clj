@@ -16,22 +16,28 @@
 (defmacro half [x] `(/ ~x 2))
 
 (defn mapply
-  "Useful for invoking functions with keyword args"
+  "Useful for invoking functions with keyword args, thanks David Nolen."
   [f m]
   (apply f (apply concat m)))
 
+(defn kwargify
+  "Takes a function that expects a map and returns a function that accepts keyword arguments on its behalf, thanks Fogus."
+  [f]
+  (fn [& kwargs] (f (apply hash-map kwargs))))
 
 (defmacro c2-obj
-  "Macro that expands into reify with getters/setters for fields and Associative implementation that calls constructor with keyword args of fields."
-  [constructor iface fields & body]
-  `(reify
-     ~iface
-     ~@(concat (apply concat (for [f fields]
-                               (list `(~f [~'_] ~f)
-                                     `(~f [~'_ ~'x] (mapply ~constructor (assoc ~'args ~f ~'x))))))
-         `[clojure.lang.ILookup (~'valAt [~'_ ~'k] (~'args ~'k))
-           clojure.lang.Associative (~'assoc [~'_ ~'k ~'v] (mapply ~constructor (assoc ~'args ~'k ~'v)))]
-         body)))
+  "Macro that defines a record and corresponding constructor that accepts keyword arguments.
+   The constructor function is defined to be the given name, with the record having an underscore prefix."
+  [name fields-with-defaults & body]
+  (let [recname (symbol (str "_" (clojure.core/name name)))]
+    `(do
+       (defrecord ~recname ~(into [] (map (comp symbol clojure.core/name)
+                                          (keys fields-with-defaults)))
+         ~@body)
+       (defn ~name [& ~'kwargs]
+         (~(symbol (str "map->" (clojure.core/name recname)))
+          (merge ~fields-with-defaults (apply hash-map ~'kwargs)))))))
+
 
 (defn dont-carity
   "Execute fn with args, catching wrong-arity errors and retrying with (butlast args).
