@@ -9,7 +9,12 @@
 
 
 (defn style
-  "Convert map to CSS string"
-  [m]
+  "Convert map to CSS string. Optional :numeric-suffix added to numbers (defaults to 'px')."
+  [m & {:keys [numeric-suffix]
+        :or {numeric-suffix "px"}}]
   (join (for [[k v] m]
-          (str (name k) ":" v ";"))))
+          (str (name k) ":"
+               (if (number? v)
+                 (str v numeric-suffix)
+                 v)
+               ";"))))
