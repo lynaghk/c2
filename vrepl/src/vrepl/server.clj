@@ -5,8 +5,10 @@
                            wrap-ring-handler wrap-aleph-handler]]
         [lamina.core :only [enqueue permanent-channel receive siphon]]
         [hiccup.core :only [html]]
-        [clojure.data.json :only [read-json json-str]])
-  (:require [vrepl.core :as core]))
+        [clojure.data.json :only [read-json json-str]]
+        [clojure.string :only [join]])
+  (:require [vrepl.core :as core]
+            [compojure.route :as route]))
 
 ;;Messages to livereload client.
 ;;http://help.livereload.com/kb/ecosystem/livereload-protocol
@@ -46,17 +48,20 @@
 (defroutes main-routes
   (GET "/" []
        (html [:html
-                     [:head
-                      [:script {:src (str "/livereload.js?port=" (:port @core/opts))}]
-                      [:style "body { background-color: #222222; color: white;}"]]
+              [:head
+               [:script {:src (str "/livereload.js?port=" (:port @core/opts))}]
+               [:style (join "\n" ["body { background-color: #222222; color: white;}"
+                                   "h1 { text-align: center; font: 5em sans-serif; margin: 1em;}"])]]
               [:body
 
-                      @core/current-page]]))
+               @core/current-page]]))
+
   (GET "/livereload" []
-       (wrap-aleph-handler livereload-handler)))
+       (wrap-aleph-handler livereload-handler))
+
+  (route/resources "/"))
 
 (def app (-> main-routes
-             (wrap-file "public")
              (wrap-ring-handler)))
 
 (defn start-server! []

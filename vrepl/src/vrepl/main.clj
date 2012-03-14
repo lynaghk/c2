@@ -13,7 +13,7 @@
   ;;Hardcoded list of sample files in the JAR to extract.
   ;;Pull request if you want to write something more general.
   (doseq [f ["boxplot.clj" "choropleth.clj"]]
-    (spit (str path "/" f) (slurp (ClassLoader/getSystemResource f)))))
+    (spit (str path "/" f) (slurp (ClassLoader/getSystemResource (str "samples/" f))))))
 
 
 (defn monitor-and-start [path port]
@@ -26,9 +26,10 @@
   (let [[{:keys [path port] :as opts} args banner] (cli args
                                                         ["-h" "--help" "Show help" :default false :flag true]
                                                         ["--compile-all" "Compile all files to HTML" :default false :flag true]
-                                                        ["--extract-to" "Extract built-in samples to relative directory and watch 'em"
+                                                        ["--extract" "Extract built-in samples directory before starting watcher" :default false :flag true]
+                                                        ["--path" "Path to watch (recursive)"
+                                                         :default (str (System/getProperty "user.dir") "/" "resources/samples")
                                                          :parse-fn #(str (System/getProperty "user.dir") "/" %)]
-                                                        ["--path" "Path to watch (recursive)" :default (str (System/getProperty "user.dir") "/samples")]
                                                         ["--port" "Webserver port" :default 8987 :parse-fn #(Integer. %)])]
 
     (reset! core/opts opts)
@@ -37,19 +38,15 @@
       (println banner)
       (System/exit 0))
 
+    (when (:compile-all opts) 
+      (core/compile-all! path)
+      (System/exit 0))
+    
+    (when (:extract opts)
+      (extract-assets! path))
 
-    (cond
-     (:extract-to opts) (do
-                          (extract-assets! (:extract-to opts))
-                          (monitor-and-start (:extract-to opts) port))
-
-     (:compile-all opts) (do
-                           (core/compile-all! path)
-                           (System/exit 0))
-
-     :else (monitor-and-start path port))))
-
-
-#_(when (not (.exists (java.io.File. path)))
-    (println "Path\"" path "\"not found")
-    (System/exit 1))
+    (when (not (.exists (java.io.File. path)))
+      (println "Path" (str "\"" path "\"") "not found")
+      (System/exit 1))
+    
+    (monitor-and-start path port)))

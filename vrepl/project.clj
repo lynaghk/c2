@@ -9,12 +9,6 @@
                  [aleph "0.2.1-alpha2-SNAPSHOT"]
 
                  [com.keminglabs/vomnibus "0.0.1-SNAPSHOT"]
-                 [com.keminglabs/c2 "0.0.1-SNAPSHOT"]
-
-                 ]
+                 [com.keminglabs/c2 "0.0.1-SNAPSHOT"]]
   
-
-
-  ;;Package up with samples for JAR usage
-  :resources-path "samples"
   :main vrepl.main)

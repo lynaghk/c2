@@ -7,7 +7,7 @@
   (:use [hiccup.core :only [html]]))
 
 (def opts (atom {}))
-(def current-page (atom [:p (str "Visual REPL ready.")]))
+(def current-page (atom [:h1 "Visual REPL ready."]))
 
 (defn output-clj!
   "Output result of freshly reloaded Clojure file"
