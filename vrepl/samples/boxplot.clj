@@ -25,13 +25,12 @@
   [:svg#main {:style (style {:display "block"
                              :margin "auto"
                              :height height
-                             :width width
-                             :border "1px solid black"})}
+                             :width width})}
 
    [:style {:type "text/css"}
     (join "\n" [ "<![CDATA["
-                 ".box { fill: white; stroke: black; }"
-                 "line {stroke: black;}"
+                 ".box {fill: #222222; stroke: white; }"
+                 "line {stroke: white;}"
                  "line.range {stroke-dasharray: 5,5;}"
                  "]]>"])]
    

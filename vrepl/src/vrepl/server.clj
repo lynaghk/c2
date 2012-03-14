@@ -47,8 +47,10 @@
   (GET "/" []
        (html [:html
                      [:head
-                      [:script {:src (str "/livereload.js?port=" (:port @core/opts))}]]
-                     [:body
+                      [:script {:src (str "/livereload.js?port=" (:port @core/opts))}]
+                      [:style "body { background-color: #222222; color: white;}"]]
+              [:body
+
                       @core/current-page]]))
   (GET "/livereload" []
        (wrap-aleph-handler livereload-handler)))
