@@ -6,11 +6,11 @@
         [clojure.string :only [join]])
   (:require [c2.scale :as scale]))
 
-(let [height 500
+(let [height 400
+      width 960
       group-width 30
       box-width 20
-
-      data (repeatedly 10
+      data (repeatedly (/ width group-width)
                       #(into {} (map vector
                                      [:min :q5 :q10 :q25 :median :q75 :q90 :q95 :max]
                                      (sort (take 9 (repeatedly rand))))))
@@ -24,8 +24,8 @@
   
   [:svg#main {:style (style {:display "block"
                              :margin "auto"
-                             :height (str height "px")
-                             :width "80%"
+                             :height height
+                             :width width
                              :border "1px solid black"})}
 
    [:style {:type "text/css"}
