@@ -6,7 +6,10 @@
 
 (defn extract-assets! [path]
   (println  "Extracting assets to" path)
-
+  
+  (when (not (.exists (java.io.File. path)))
+    (.mkdir (java.io.File. path)))
+  
   ;;Hardcoded list of sample files in the JAR to extract.
   ;;Pull request if you want to write something more general.
   (doseq [f ["boxplot.clj" "choropleth.clj"]]
