@@ -8,7 +8,7 @@
                  [hiccup "0.3.8"]
                  [aleph "0.2.1-alpha2-SNAPSHOT"]
 
-                 [com.keminglabs/vomnibus "0.0.1-SNAPSHOT"]
+                 [com.keminglabs/vomnibus "0.1.0"]
                  [com.keminglabs/c2 "0.0.1-SNAPSHOT"]]
   
   :main vrepl.main)
