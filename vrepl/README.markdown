@@ -5,9 +5,9 @@ Render your Clojure visualizations as you write 'em.
 
 To start:
 
-    lein run  --port 8987 --path samples/
+    lein run  --port 8987 --path resources/samples/
 
-Serves up the final form of the most recently changed file in `samples/` and automatically refreshes your browser.
+Serves up the final form of the most recently changed file in `resources/samples/` and automatically refreshes your browser.
 
 If you don't have Leiningen installed, you can download the pre-built JAR file:
 
