@@ -11,13 +11,7 @@ Declarative behavior?
 
 Is it possible to use pre/post conditions in development, but then strip them out when compiling to JS to save space?
 
-
-Implement scales, &c. as "objects":
-
-    (def s (scale :domain [0 50] :range [0 1]))
-    (s 25) ;=> 0.5
-    (:domain s) ;=> [0 50]
-
+Build tooling around Lein cljsbuild to juggle "cljx" files into valid Clojure/ClojureScript.
 
 Visual REPL
 -----------
