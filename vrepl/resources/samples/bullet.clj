@@ -19,6 +19,7 @@
 .bullet .subtitle { fill: #999; }
 ")
 
+
 (let [data [{:title "Revenue" :subtitle "US$ in thousands" :ranges [150 225 300] :measures [220 270] :markers [250]}
             {:title "Profit" :subtitle "%" :ranges [20 25 30] :measures [21 23] :markers [26]}
             {:title "Order Size" :subtitle "US$ average" :ranges [350 500 600] :measures [100 320] :markers [550]}
@@ -36,13 +37,13 @@
                  s (scale/linear :domain [0 (apply max (flatten [ranges measures markers]))]
                                  :range [0 bar-width])]
              
-             [:svg.bullet {:xmlns "http://www.w3.org/2000/svg" :width 960 :height 400}
+             [:svg.bullet {:xmlns "http://www.w3.org/2000/svg" :width 960 :height 40}
               [:style {:type "text/css"} (str "<![CDATA[" css "]]>")]
               
               ;;Text labels
               [:g.labels {:transform (str "translate(" (- label-margin 5) "," 12  ")")}
-               [:text title]
-               [:text {:dy "1.2em"} subtitle]]
+               [:text.title title]
+               [:text.subtitle {:dy "1.2em"} subtitle]]
               
               ;;Rects; move to the right to make room for labels
               [:g.rects {:transform (str "translate(" label-margin ", 0)")}
