@@ -75,7 +75,8 @@
 Automatically updates elements mapped to data according to key-fn (defaults to index) and removes elements that don't match.
 Scoped to selector, if given, otherwise applies to all container's children.
 Optional enter, update, and exit functions called before DOM is changed; return false to prevent default behavior."
-  [container data mapping & {:keys [selector key-fn pre-fn post-fn update exit enter]
+  [container data mapping & {:keys [selector key-fn pre-fn post-fn update exit enter
+                                    defer-attr]
                              :or {key-fn (fn [d idx] idx)
                                   enter  (fn [d idx new-node]
                                            #_(p "no-op enter called")
@@ -85,7 +86,8 @@ Optional enter, update, and exit functions called before DOM is changed; return 
                                            true)
                                   exit   (fn [d idx old-node]
                                            #_(p "default remove called")
-                                           true)}}]
+                                           true)
+                                  defer-attr false}}]
 
   (let [container (select container)
         ;;This logic should be abstracted out via a (unify!) multimethod, once (apply multimethod) is fixed in ClojureScript
@@ -101,7 +103,8 @@ Optional enter, update, and exit functions called before DOM is changed; return 
                                         :update update
                                         :exit exit
                                         :pre-fn pre-fn
-                                        :post-fn post-fn)))
+                                        :post-fn post-fn
+                                        :defer-attr defer-attr)))
                    @data)
                data)
         
@@ -139,10 +142,7 @@ Optional enter, update, and exit functions called before DOM is changed; return 
                 (if (not= d (:datum old))
                   (if (update d idx (:node old) new-node)
                     (merge-dom! (:node old) new-node
-
-                                ;;don't use requestAnimationFrame until we can figure out how to get it playing nicely with automated tests.
-                                ;;:defer-attr true
-                                ))))
+                                :defer-attr defer-attr))))
 
               (if (enter d idx new-dom-node)
                 (append! container new-node)))))
