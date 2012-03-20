@@ -26,7 +26,7 @@
                          (loop [node (.-target event)]
                            (if-let [d (read-data node)]
                              ;;Then, call the handler on this node
-                             (dont-carity f d idx node event)
+                             (dont-carity f d node event)
                              (if-let [parent (dom/parent node)]
                                (recur parent)))))))))
 
