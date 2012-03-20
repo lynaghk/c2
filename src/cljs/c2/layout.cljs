@@ -1,10 +1,11 @@
+(comment 
+
 (ns c2.layout
   (:refer-clojure :exclude [+ - =])
   (:use-macros [c2.util :only [p half]])
   (:use [c2.core :only [translate children select select-all]]
         [cassowary.core :only [+ - = cvar constrain! stay! simplex-solver]]))
 
-(comment 
   (defn distribute! [selector]
     (let [solver (simplex-solver)
           spacing  (cvar 0)
