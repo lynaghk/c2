@@ -40,7 +40,7 @@
 (defmulti attach-data (fn [node d] (node-type node)))
 (defmethod attach-data :chiccup [node d]
   (assoc-in node [:attr (str "data-" node-data-key)]
-              (binding [*print-dup* true] (pr-str d))))
+            (binding [*print-dup* true] (pr-str d))))
 
 (defmethod attach-data :dom [node d]
   (attr node (str "data-" node-data-key)
@@ -75,7 +75,7 @@
 Automatically updates elements mapped to data according to key-fn (defaults to index) and removes elements that don't match.
 Scoped to selector, if given, otherwise applies to all container's children.
 Optional enter, update, and exit functions called before DOM is changed; return false to prevent default behavior."
-  [container data mapping & {:keys [selector key-fn post-fn update exit enter]
+  [container data mapping & {:keys [selector key-fn pre-fn post-fn update exit enter]
                              :or {key-fn (fn [d idx] idx)
                                   enter  (fn [d idx new-node]
                                            #_(p "no-op enter called")
@@ -100,8 +100,13 @@ Optional enter, update, and exit functions called before DOM is changed; return 
                                         :enter  enter
                                         :update update
                                         :exit exit
+                                        :pre-fn pre-fn
                                         :post-fn post-fn)))
                    @data)
+               data)
+        
+        data (if pre-fn
+               (pre-fn data)
                data)
 
 
@@ -121,7 +126,7 @@ Optional enter, update, and exit functions called before DOM is changed; return 
             (if (exit datum idx node)
               (gdom/removeNode node))))
 
-    
+
     ;;For each datum, update existing nodes and add new ones
     (iter {for [idx d] in (map-indexed vector data)}
           (let [new-node (attach-data (cannonicalize (mapping d idx)) d)]
@@ -134,7 +139,7 @@ Optional enter, update, and exit functions called before DOM is changed; return 
                 (if (not= d (:datum old))
                   (if (update d idx (:node old) new-node)
                     (merge-dom! (:node old) new-node
-                                
+
                                 ;;don't use requestAnimationFrame until we can figure out how to get it playing nicely with automated tests.
                                 ;;:defer-attr true
                                 ))))

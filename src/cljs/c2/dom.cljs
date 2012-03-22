@@ -44,7 +44,7 @@
           (.-childNodes (select node))))
 
 (defn parent [node]
-  (.parentNode (select node)))
+  (.-parentNode (select node)))
 
 
 

@@ -2,10 +2,12 @@
   (:gen-class)
   (:import org.apache.commons.vfs2.VFS
            org.apache.commons.vfs2.impl.DefaultFileMonitor
-           org.apache.commons.vfs2.FileListener))
+           org.apache.commons.vfs2.FileListener)
+  (:require [clojure.string :as str])
+  (:use [hiccup.core :only [html]]))
 
 (def opts (atom {}))
-(def current-page (atom [:p (str "Visual REPL ready.")]))
+(def current-page (atom [:h1 "Visual REPL ready."]))
 
 (defn output-clj!
   "Output result of freshly reloaded Clojure file"
@@ -32,3 +34,12 @@
                                path))
     (.setRecursive fm true)
     (.start fm)))
+
+
+(defn compile-all! [path]
+  (doseq [f (.listFiles (java.io.File. path))
+          :when (re-matches #".*\.clj" (.getName f))]
+    (spit (str/replace (.getPath f) "clj" "html")
+          (html (load-file (.getPath f))))))
+
+

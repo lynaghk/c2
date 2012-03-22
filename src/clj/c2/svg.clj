@@ -1,6 +1,10 @@
 (ns c2.svg
   (:use [c2.maths :only [Pi Tau radians-per-degree
                          sin cos]]))
+;;Lil' SVG helpers
+(defn translate [[x y]] (str "translate(" x "," y ")"))
+(defn scale [[x y]] (str "scale(" x "," y ")"))
+
 
 (def ArcMax (- (* 2 Pi) 0.0000001))
 
