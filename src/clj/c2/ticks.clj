@@ -1,5 +1,5 @@
 (ns c2.ticks
-  (c2.maths :only [sq]))
+  (:use [c2.maths :only [sq]]))
 ;;Implementation of "An Extension of Wilkinson’s Algorithm for Positioning Tick Labels on Axes" by Justin Talbot, Sharon Lin, and Pat Hanrahan:
 ;;
 ;;    http://graphics.stanford.edu/vis/publications/2010/labeling-preprint.pdf

@@ -12,4 +12,4 @@
   :repositories {"stuartsierra-releases" "http://stuartsierra.com/maven2"
                  "stuartsierra-snapshots" "http://stuartsierra.com/m2snapshots"}
   
-  :source-path "src/clj")
+  :source-paths ["src/clj"])
