@@ -36,8 +36,38 @@
                     (sq (- d-min l-min)))
                  (sq (* 0.1 (- d-max d-min)))))))
 
+(defn max-coverage
+  "When the label range is centered on the data range"
+  [d-min d-max span]
+  (let [d-range (- d-max d-min)]
+    (if (> span d-range)
+      (- 1 (sq (/ (- span d-range)
+                  (* 0.2 d-range))))
+      1)))
+
 (defn density
   "Objective function for a candidate density r and desired density rt (e.g. labels-per-cm)"
   [r rt]
   ;;Note the formula should be 2-, not 1- as in the paper.
   (- 2 (max (/ r rt) (/ rt r))))
+
+(defn max-density [r rt]
+  (if (>= r rt)
+    (- 2 (/ r rt))
+    1))
+
+(defn- w
+  "Balance the relative merits of different metrics"
+  [[simplicity coverage density legibility]]
+  (let [w [0.2 0.25 0.5 0.05]]
+    (+ (* simplicity (w 1))
+       (* coverage (w 2))
+       (* density (w 3))
+       (* legibility (w 4)))))
+
+
+
+(defn search
+  "Find best ticks for the data range (dmin, dmax) and target label density m"
+  [dmin dmax m]
+  )
