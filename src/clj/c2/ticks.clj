@@ -15,18 +15,19 @@
   (first (for [[idx y] (map-indexed vector coll)
                :when (= y x)] idx)))
 
+(defn label-range-contains-zero? [l-min l-max l-step]
+  (and (> l-max 0) (< l-min 0) (zero? (mod l-min l-step))))
 
 (defn simplicity
   "Objective function modeling niceness of step sizes and whether a range includes zero."
-  [q Q j l-min l-max l-step]
-  (let [v ;;Does the range contain zero?
-        (and (> l-max 0)
-             (< l-min 0)
-             (zero? (mod l-min l-step)))]
+  [q Q j label-range-contains-zero]
+  (let [v (if label-range-contains-zero 1 0)]
     (if (<= (count Q) 1)
       (+ (- 1 j) v)
       (+ (- 1 (/ (index-of q Q) (dec (count Q))) j)
          v))))
+
+(defn max-simplicity [q Q j] (simplicity q Q j true))
 
 (defn coverage
   "Objective function based on distances between extreme data and extreme labels"
