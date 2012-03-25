@@ -72,7 +72,7 @@
 (defn style
   ([el] (throw (js/Error. "TODO: return map of element styles")))
   ([el x] (match [x]
-                 [(k :when keyword?)] (gstyle/getStyle el (name k))
+                 [(k :when keyword?)] (gstyle/getComputedStyle el (name k))
                  [(m :when map?)] (doseq [[k v] m] (style el k v))))
   ([el k v] (gstyle/setStyle el (name k) v)))
 
