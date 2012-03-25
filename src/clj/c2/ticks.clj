@@ -1,5 +1,6 @@
 (ns c2.ticks
-  (:use [c2.maths :only [sq]]))
+  (:use [c2.maths :only [sq ceil floor log10 expt]]
+        [iterate :only [iter]]))
 ;;Implementation of "An Extension of Wilkinson’s Algorithm for Positioning Tick Labels on Axes" by Justin Talbot, Sharon Lin, and Pat Hanrahan:
 ;;
 ;;    http://graphics.stanford.edu/vis/publications/2010/labeling-preprint.pdf
@@ -20,14 +21,14 @@
 
 (defn simplicity
   "Objective function modeling niceness of step sizes and whether a range includes zero."
-  [q Q j label-range-contains-zero]
+  [q j label-range-contains-zero]
   (let [v (if label-range-contains-zero 1 0)]
     (if (<= (count Q) 1)
       (+ (- 1 j) v)
       (+ (- 1 (/ (index-of q Q) (dec (count Q))) j)
          v))))
 
-(defn max-simplicity [q Q j] (simplicity q Q j true))
+(defn max-simplicity [q j] (simplicity q j true))
 
 (defn coverage
   "Objective function based on distances between extreme data and extreme labels"
@@ -45,12 +46,15 @@
                   (* 0.2 d-range))))
       1)))
 
+
 (defn density
   "Objective function for a candidate density r and desired density rt (e.g. labels-per-cm)"
   [r rt]
   ;;Note the formula should be 2-, not 1- as in the paper.
   (- 2 (max (/ r rt) (/ rt r))))
 
+;;Since the arguments are the same, I don't see what the story is with density / max density.
+;;This isn't satisfactorily explained in the paper.
 (defn max-density [r rt]
   (if (>= r rt)
     (- 2 (/ r rt))
@@ -60,14 +64,70 @@
   "Balance the relative merits of different metrics"
   [[simplicity coverage density legibility]]
   (let [w [0.2 0.25 0.5 0.05]]
-    (+ (* simplicity (w 1))
-       (* coverage (w 2))
-       (* density (w 3))
-       (* legibility (w 4)))))
+    (+ (* simplicity (w 0))
+       (* coverage (w 1))
+       (* density (w 2))
+       (* legibility (w 3)))))
 
 
 
 (defn search
-  "Find best ticks for the data range (dmin, dmax) and target label density m"
-  [dmin dmax m]
+  "Find best ticks for the data range (d-min, d-max) and target label density "
+  [d-min d-max & {:keys [target-density
+                         length]
+                  :or {target-density 0.01 ;;Default to one label per 100 px
+                       length         500}}]
+  
+  ;;To be on the safe side, I've copied the imperative algorithm from the paper.
+  ;;If you rewrite it in an understandable and performant functional style, we'll accept a pull request and buy you a bottle of whiskey
+  (let [best-score (atom -2)
+        label (atom {})]
+    
+    (iter {for q in Q}
+          
+          (iter {for j from 1}
+                {for ms = (max-simplicity q j)}
+                {return-if (< (w [ms 1 1 1]) @best-score)}
+                
+                (iter {for k from 2}
+                      {for md = (max-density (/ k length) target-density)}
+                      {return-if (< (w [ms 1 md 1]) @best-score)}
+                      
+                      (let [delta ;;power of ten by which to multiply the step size
+                            (/ (- d-max d-min)
+                               (* (inc k) j k))]
+                        (iter {for z from (ceil (log10 delta))}
+                              {for l-step = (* q j (expt 10 z))}
+                              {for mc = (max-coverage d-min d-max (* (dec k) l-step))}
+                              {return-if (< (w [ms mc md 1]) @best-score)}
+
+                              (iter {for start
+                                     from (- (floor (/ d-max l-step))
+                                             (dec k))
+                                     to (/ d-min l-step)
+                                     by (/ 1 j)}
+                                    {for l-min = (* start l-step)}
+                                    {for l-max = (+ l-min (* (dec k) l-step))}
+                                    {for s = (simplicity q j (label-range-contains-zero? l-min l-max l-step))}
+                                    {for c = (coverage d-min d-max l-min l-max)}
+                                    {for d = (density (/ k length) target-density)}
+                                    {for score = (w [s c d 1])}
+                                    {return-if (< score @best-score)}
+                                    
+                                    ;;todo, optimize legibility
+                                    (reset! best-score score)
+                                    (reset! label {:l-min l-min
+                                                   :l-max l-max
+                                                   :l-step l-step})))))))
+
+    @label))
+
+(search 0.1 9)
+
+(comment
+  (iter {for j from 1 to 5}
+        {for y = (inc x)}
+        {for x = (inc j)}
+        
+        (println y))
   )
