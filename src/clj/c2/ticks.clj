@@ -72,27 +72,33 @@
 
 
 (defn search
-  "Find best ticks for the data range (d-min, d-max) and target label density "
-  [d-min d-max & {:keys [target-density
-                         length]
-                  :or {target-density 0.01 ;;Default to one label per 100 px
-                       length         500}}]
-  
+  "Find best ticks for the data range (d-min, d-max) and target label density.
+Returns a map with {:min :max :step} of optimal labeling, if one is found.
+Returns an empty map if no labelings can be found.
+
+target-density: labels per length; defaults to 0.01---one label per 100 units
+length: available label spacing
+"
+  [[d-min d-max] & {:keys [target-density
+                           length]
+                    :or {target-density 0.01 ;;Default to one label per 100 px
+                         length         500}}]
+
   ;;To be on the safe side, I've copied the imperative algorithm from the paper.
-  ;;If you rewrite it in an understandable and performant functional style, we'll accept a pull request and buy you a bottle of whiskey
+  ;;If you rewrite it in an understandable and performant functional style, we'll accept a pull request and buy you a bottle of whiskey.
   (let [best-score (atom -2)
         label (atom {})]
-    
+
     (iter {for q in Q}
-          
+
           (iter {for j from 1}
                 {for ms = (max-simplicity q j)}
                 {return-if (< (w [ms 1 1 1]) @best-score)}
-                
+
                 (iter {for k from 2}
                       {for md = (max-density (/ k length) target-density)}
                       {return-if (< (w [ms 1 md 1]) @best-score)}
-                      
+
                       (let [delta ;;power of ten by which to multiply the step size
                             (/ (- d-max d-min)
                                (* (inc k) j k))]
@@ -114,20 +120,18 @@
                                     {for score = (w [s c d 1])}
                                     {return-if (< score @best-score)}
                                     
+                                    ;;(println "inner loop")
                                     ;;todo, optimize legibility
+                                    
                                     (reset! best-score score)
-                                    (reset! label {:l-min l-min
-                                                   :l-max l-max
-                                                   :l-step l-step})))))))
+                                    (reset! label {:min l-min
+                                                   :max l-max
+                                                   :step l-step})))))))
 
     @label))
 
-(search 0.1 9)
 
 (comment
-  (iter {for j from 1 to 5}
-        {for y = (inc x)}
-        {for x = (inc j)}
-        
-        (println y))
+  (search [1 9])
+  (search [1 9] :target-density (/ 1 20))
   )
