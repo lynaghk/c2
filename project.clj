@@ -2,7 +2,7 @@
   :description "Declarative data visualization in Clojure(Script)."
   :dependencies [[org.clojure/clojure "1.3.0"]
                  [org.clojure/core.match "0.2.0-alpha9"]
-                 [clj-iterate "0.95-SNAPSHOT"]]
+                 [clj-iterate "0.96"]]
   
   :dev-dependencies [[midje "1.3.1"]
                      [lein-midje "1.0.8"]
