@@ -1,4 +1,4 @@
-(defproject com.keminglabs/c2 "0.0.1-SNAPSHOT"
+(defproject com.keminglabs/c2 "0.0.1"
   :description "Declarative data visualization in Clojure(Script)."
   :dependencies [[org.clojure/clojure "1.3.0"]
                  [org.clojure/core.match "0.2.0-alpha9"]

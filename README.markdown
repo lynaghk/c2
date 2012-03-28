@@ -31,9 +31,19 @@ There's also a two minute [screencast](https://www.youtube.com/watch?v=Urg79FmQn
 
 The VREPL doesn't contain any ClojureScript---nice ClojureScript support+examples coming as soon as Clojure/ClojureScript code-sharing issues are resolved in Lein tooling.
 
-To use in Clojure/ClojureScript, add this to your `project.clj`:
+To use from Clojure, add this to your `project.clj`:
 
-    [com.keminglabs/c2 "0.0.1-SNAPSHOT"]
+    [com.keminglabs/c2 "0.0.1"]
+
+Roadmap
+=======
+
++ Fixup Clojure/ClojureScript support by moving as much of the source as possible to "cljx" intermediate format that can be statically transformed into platform-appropriate sources.
+
++ Moar documentation, consistent docstring format.
+
++ Official release
+
 
 Testing
 =======
