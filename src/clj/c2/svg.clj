@@ -1,12 +1,52 @@
 (ns c2.svg
   (:use [c2.maths :only [Pi Tau radians-per-degree
-                         sin cos]]))
+                         sin cos]]
+        [clojure.core.match :only [match]]))
+
+
 ;;Lil' SVG helpers
-(defn translate [[x y]] (str "translate(" x "," y ")"))
-(defn scale [[x y]] (str "scale(" x "," y ")"))
+(defn translate [coordinates]
+  (match [coordinates]
+         [[x y]] (str "translate(" x "," y ")")
+         [{:x x :y y}] (recur [x y])))
+
+(defn scale [coordinates]
+  (match [coordinates]
+         [[x y]] (str "scale(" x "," y ")")
+         [{:x x :y y}] (recur [x y])))
 
 
-(def ArcMax (- (* 2 Pi) 0.0000001))
+(defn axis
+  "Returns axis <g> for input scale with ticks.
+Direction away from the data frame is defined to be positive; use negative margins and widths for the axis to render inside of the data frame"
+  [scale ticks & {:keys [orientation
+                         formatter
+                         major-tick-width
+                         text-margin]
+                  :or {orientation :left
+                       formatter str
+                       major-tick-width 6
+                       text-margin 9}}]
+
+  (let [[x y x1 x2 y1 y2] (case orientation
+                            (:left :right) [:x :y :x1 :x2 :y1 :y2]
+                            (:top :bottom) [:y :x :y1 :y2 :x1 :x2])
+
+        parity (case orientation
+                 (:left :top) -1
+                 (:right :bottom) 1)]
+
+    [:g.axis {:class (name orientation)}
+     [:line.rule (apply hash-map (interleave [y1 y2] (:range scale)))]
+
+     (map (fn [d]
+            [:g.major-tick {:transform (translate {x 0 y (scale d)})}
+             [:text {x (* parity text-margin)} (formatter d)]
+             [:line {x1 0 x2 (* parity major-tick-width)}]])
+          ticks)]))
+
+
+(def ArcMax (- Tau 0.0000001))
 
 (defn circle
   "Returns svg path data for a circle starting at 3 o'clock and sweeping in positive y."
