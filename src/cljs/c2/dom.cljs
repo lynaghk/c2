@@ -109,6 +109,7 @@
   [x]
   (match [x]
          [(str :when string?)] str
+         [(n   :when number?)] (str n)
          [(m   :when map?)] m ;;todo, actually check to make sure map has nsp, tag, attr, and children keys
          ;;todo, make explicit match here for attr map and clean up crazy Pinot logic below
          [[tag & content]]   (let [[_ tag id class] (re-matches re-tag (name tag))
