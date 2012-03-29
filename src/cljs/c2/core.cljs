@@ -68,7 +68,8 @@
 ;;(defmethod unify! :seq)
 
 
-
+;;Used to generate unique IDs for auto-unify atom watchers
+(def ^:private auto-unify-id (atom 0))
 
 (defn unify!
   "Calls (mapping datum idx) for each datum and appends resulting elements to container.
@@ -93,7 +94,7 @@ Optional enter, update, and exit functions called before DOM is changed; return 
         ;;This logic should be abstracted out via a (unify!) multimethod, once (apply multimethod) is fixed in ClojureScript
         data (if (instance? cljs.core.Atom data)
                ;;Then add a watcher to auto-unify when the atom changes, and deference data for this run
-               (do (add-watch data :auto-unify
+               (do (add-watch data (keyword (str "auto-unify" (swap! auto-unify-id inc)))
                               (fn [key data-atom old new]
                                 (p "atom updated; automatically calling unify!")
                                 (unify! container data mapping
