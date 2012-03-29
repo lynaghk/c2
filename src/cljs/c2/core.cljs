@@ -145,8 +145,11 @@ Optional enter, update, and exit functions called before DOM is changed; return 
                     (merge-dom! (:node old) new-node
                                 :defer-attr defer-attr))))
 
-              (if (enter d idx new-dom-node)
-                (append! container new-node)))))
+              ;;instantiate new node on the DOM so it can be manipulated in the user-specified `enter` fn.
+              (let [new-dom-node (append! "body" new-node)]
+                (if (enter d idx new-dom-node)
+                  (append! container new-dom-node) ;;move new node to container
+                  (remove! new-dom-node))))))
 
     ;;Run post-fn, if it was given
     (if post-fn
