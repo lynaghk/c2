@@ -97,7 +97,7 @@ Optional enter, update, and exit functions called before DOM is changed; return 
                (do (add-watch data (keyword (str "auto-unify" (swap! auto-unify-id inc)))
                               (fn [key data-atom old new]
                                 (p "atom updated; automatically calling unify!")
-                                (unify! container data mapping
+                                (unify! container @data-atom mapping
                                         :selector selector
                                         :key-fn key-fn
                                         :enter  enter
