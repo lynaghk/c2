@@ -55,6 +55,9 @@
     (gdom/appendChild (select container) el)
     el))
 
+(defn remove! [el]
+  (gdom/removeNode (select el)))
+
 
 (defn attr
   ([el] (let [attrs (.-attributes el)]

@@ -128,7 +128,7 @@ Optional enter, update, and exit functions called before DOM is changed; return 
                                     (set (map key-fn data (range))))}
           (let [{:keys [node idx datum]} (existing-nodes-by-key k)]
             (if (exit datum idx node)
-              (gdom/removeNode node))))
+              (remove! node))))
 
 
     ;;For each datum, update existing nodes and add new ones
