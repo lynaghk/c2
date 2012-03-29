@@ -2,8 +2,11 @@
 pom.xml
 *.jar
 *.war
+.lein-deps-sum
+.DS_Store
 lib
 classes
 build
 resources/*
 out/
+.generated
