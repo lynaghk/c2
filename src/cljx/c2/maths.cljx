@@ -19,9 +19,9 @@
 (defn ^:clj expt
   ([x] (Math/exp x))
   ([x y] (Math/pow x y)))
-(defn ^:clj expt
-  ([x] (Math/exp x))
-  ([x y] (Math/pow x y)))
+(defn ^:cljs expt
+  ([x] (.exp js/Math x))
+  ([x y] (.pow js/Math x y)))
 
 (defn ^:clj sqrt [x] (Math/sqrt x))
 (defn ^:cljs sqrt [x] (.sqrt js/Math x))
