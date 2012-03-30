@@ -1,5 +1,8 @@
 (defproject com.keminglabs/c2 "0.0.1"
   :description "Declarative data visualization in Clojure(Script)."
+  :url "http://keminglabs.com/c2/"
+  :license {:name "BSD" :url "http://www.opensource.org/licenses/BSD-3-Clause"}
+  
   :dependencies [[org.clojure/clojure "1.3.0"]
                  [org.clojure/core.match "0.2.0-alpha9"]
                  [clj-iterate "0.96"]]
