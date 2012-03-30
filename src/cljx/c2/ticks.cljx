@@ -1,6 +1,11 @@
-(ns c2.ticks
-  (:use [c2.maths :only [sq ceil floor log10 expt]]
-        [iterate :only [iter]]))
+^:clj (ns c2.ticks
+        (:use [c2.maths :only [sq ceil floor log10 expt]]
+              [iterate :only [iter]]))
+
+^:cljs (ns c2.ticks
+         (:use-macros [iterate :only [iter]])
+         (:use [c2.maths :only [sq ceil floor log10 expt]]))
+
 ;;Implementation of "An Extension of Wilkinson’s Algorithm for Positioning Tick Labels on Axes" by Justin Talbot, Sharon Lin, and Pat Hanrahan:
 ;;
 ;;    http://graphics.stanford.edu/vis/publications/2010/labeling-preprint.pdf
