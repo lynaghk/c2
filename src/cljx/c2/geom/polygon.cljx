@@ -1,5 +1,5 @@
 (ns c2.geom.polygon
-  (:use [c2.maths :only [add div]] :reload))
+  (:use [c2.maths :only [add div]]))
 
 (defn close-coordinates
   "Make sure a list of polygon coordinates is closed by adding the first coordinate to the end"
