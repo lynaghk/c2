@@ -1,7 +1,12 @@
-(ns c2.svg
-  (:use [c2.maths :only [Pi Tau radians-per-degree
-                         sin cos]]
-        [clojure.core.match :only [match]]))
+^:clj (ns c2.svg
+        (:use [c2.maths :only [Pi Tau radians-per-degree
+                               sin cos]]
+              [clojure.core.match :only [match]]))
+
+^:cljs (ns c2.svg
+         (:use-macros [clojure.core.match.js :only [match]])
+         (:use [c2.maths :only [Pi Tau radians-per-degree
+                                sin cos]]))
 
 
 ;;Lil' SVG helpers
