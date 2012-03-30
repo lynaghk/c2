@@ -1,7 +1,12 @@
-(ns c2.geo.projection
-  (:use [c2.maths :only [radians-per-degree
-                         sin cos sqrt]]
-        [c2.util :only [c2-obj]]))
+^:clj (ns c2.geo.projection
+        (:use [c2.maths :only [radians-per-degree
+                               sin cos sqrt]]
+              [c2.util :only [c2-obj]]))
+
+^:cljs (ns c2.geo.projection
+         (:use-macros [c2.util :only [c2-obj]])
+         (:use [c2.maths :only [radians-per-degree
+                                sin cos sqrt]]))
 
 ;;"The Albers equal-area conic projection. See http://mathworld.wolfram.com/AlbersEqual-AreaConicProjection.html"
 (c2-obj albers
@@ -11,8 +16,9 @@
          :translate [480 250]}
 
         clojure.lang.IFn
-        (invoke [this [x y]]
-                (let [phi1 (* radians-per-degree (first parallels))
+        (invoke [this coordinates]
+                (let [[lon lat] coordinates
+                      phi1 (* radians-per-degree (first parallels))
                       phi2 (* radians-per-degree (second parallels))
                       lng0 (* radians-per-degree (first origin))
                       lat0 (* radians-per-degree (second origin))
@@ -22,9 +28,9 @@
                       C (+ (* c c) (* 2 n s))
                       p0 (/ (sqrt (- C (* 2 n (sin lat0)))) n)
 
-                      t (* n (- (* radians-per-degree x)
+                      t (* n (- (* radians-per-degree lon)
                                 lng0))
-                      p (/ (sqrt (- C (* 2 n (sin (* radians-per-degree y)))))
+                      p (/ (sqrt (- C (* 2 n (sin (* radians-per-degree lat)))))
                            n)]
                   [(+ (* scale p (sin t)) (first translate))
                    (+ (* scale (- (* p (cos t)) p0))
@@ -39,8 +45,9 @@
          :translate [480 250]}
         
         clojure.lang.IFn
-        (invoke [_ [lon lat]]
-                (let [lower48 (albers :origin origin
+        (invoke [_ coordinates]
+                (let [[lon lat] coordinates
+                      lower48 (albers :origin origin
                                       :parallels parallels
                                       :scale scale
                                       :translate translate)

@@ -1,8 +1,14 @@
-(ns c2.geo.core
-  (:use [clojure.core.match :only [match]]
-        [clojure.string :only [join]]
-        [c2.maths :only [abs add sub div mul]])
-  (:require c2.geom.polygon))
+^:clj (ns c2.geo.core
+        (:use [clojure.core.match :only [match]]
+              [clojure.string :only [join]]
+              [c2.maths :only [abs add sub div mul]])
+        (:require c2.geom.polygon))
+
+^:cljs (ns c2.geo.core
+        (:use-macros [clojure.core.match.js :only [match]])
+        (:use [clojure.string :only [join]]
+              [c2.maths :only [abs add sub div mul]])
+        (:require [c2.geom.polygon :as c2.geom.polygon]))
 
 (defn geo->svg
   "Convert geoJSON to svg path data. Takes optional projection, defaulting to identity"
@@ -60,34 +66,34 @@
 
 
 (defn centroid [geo & {:keys [projection]
-                         :or {projection identity}}]
+                       :or {projection identity}}]
 
-    (defn polygon-centroid
-      "Compute polygon centroid by geometric decomposition.
+  (defn polygon-centroid
+    "Compute polygon centroid by geometric decomposition.
      http://en.wikipedia.org/wiki/Centroid#By_geometric_decomposition"
-      [poly-coordinates]
-      (let [areas (map (fn [coordinates]
-                         (abs (c2.geom.polygon/area (map projection coordinates))))
-                       poly-coordinates)]
+    [poly-coordinates]
+    (let [areas (map (fn [coordinates]
+                       (abs (c2.geom.polygon/area (map projection coordinates))))
+                     poly-coordinates)]
 
-        ;;Return hashmap containing the area so weighted centroid can be calculated for MultiPolygons.
-        {:centroid (div (apply sub (map (fn [coordinates area]
-                                 (mul (c2.geom.polygon/centroid coordinates)
-                                    area))
-                               poly-coordinates areas))
-                        (apply - areas))
-         :area (apply + areas)}))
+      ;;Return hashmap containing the area so weighted centroid can be calculated for MultiPolygons.
+      {:centroid (div (apply sub (map (fn [coordinates area]
+                                        (mul (c2.geom.polygon/centroid coordinates)
+                                             area))
+                                      poly-coordinates areas))
+                      (apply - areas))
+       :area (apply + areas)}))
 
-    (match [geo]
-           [{:type "Feature" :geometry g}]
-           (centroid g)
-           
-           [{:type "Polygon" :coordinates xs}]
-           (:centroid (polygon-centroid xs))
-           
-           [{:type "MultiPolygon" :coordinates xs}]
-           (let [centroids (map polygon-centroid xs)]
-             (div (apply add (map (fn [{:keys [centroid area]}]
-                                    (mul centroid area))
-                                  centroids))
-                  (apply add (map :area centroids))))))
+  (match [geo]
+         [{:type "Feature" :geometry g}]
+         (centroid g)
+
+         [{:type "Polygon" :coordinates xs}]
+         (:centroid (polygon-centroid xs))
+
+         [{:type "MultiPolygon" :coordinates xs}]
+         (let [centroids (map polygon-centroid xs)]
+           (div (apply add (map (fn [{:keys [centroid area]}]
+                                  (mul centroid area))
+                                centroids))
+                (apply add (map :area centroids))))))
