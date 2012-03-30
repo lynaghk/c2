@@ -48,6 +48,10 @@
 
 
 
+(declare build-dom-elem)
+(declare cannonicalize)
+
+
 (defn append! [container el]
   (let [el (if (dom-element? el)
              el
@@ -58,6 +62,12 @@
 (defn remove! [el]
   (gdom/removeNode (select el)))
 
+(defn style
+  ([el] (throw (js/Error. "TODO: return map of element styles")))
+  ([el x] (match [x]
+                 [(k :when keyword?)] (gstyle/getComputedStyle el (name k))
+                 [(m :when map?)] (doseq [[k v] m] (style el k v))))
+  ([el k v] (gstyle/setStyle el (name k) v)))
 
 (defn attr
   ([el] (let [attrs (.-attributes el)]
@@ -71,13 +81,6 @@
      (if (= :style k)
        (style el v)
        (.setAttribute el (name k) v))))
-
-(defn style
-  ([el] (throw (js/Error. "TODO: return map of element styles")))
-  ([el x] (match [x]
-                 [(k :when keyword?)] (gstyle/getComputedStyle el (name k))
-                 [(m :when map?)] (doseq [[k v] m] (style el k v))))
-  ([el k v] (gstyle/setStyle el (name k) v)))
 
 (defn text [el v]
   (gdom/setTextContent el v))
