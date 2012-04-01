@@ -25,20 +25,18 @@ Stable 1.0 release planned for May 2012.
 Play around
 ===========
 
-See [vrepl/README.markdown](https://github.com/lynaghk/c2/blob/master/vrepl/README.markdown) for instructions on using the built-in examples+interactive-development server.
+See [vrepl/README.markdown](https://github.com/lynaghk/c2/blob/master/vrepl/README.markdown) for instructions on using the built-in examples+interactive-development server (Clojure-only).
 
 There's also a two minute [screencast](https://www.youtube.com/watch?v=Urg79FmQnYs).
 
-The VREPL doesn't contain any ClojureScript---nice ClojureScript support+examples coming as soon as Clojure/ClojureScript code-sharing issues are resolved in Lein tooling.
+To use from Clojure/ClojureScript add this to your `project.clj`:
 
-To use from Clojure, add this to your `project.clj`:
+    [com.keminglabs/c2 "0.1.0-beta1"]
 
-    [com.keminglabs/c2 "0.0.1"]
+For ClojureScript development, I highly recommend using [lein-cljsbuild](https://github.com/emezeske/lein-cljsbuild).
 
 Roadmap
 =======
-
-+ Fixup Clojure/ClojureScript support by moving as much of the source as possible to "cljx" intermediate format that can be statically transformed into platform-appropriate sources.
 
 + Moar documentation, consistent docstring format.
 
