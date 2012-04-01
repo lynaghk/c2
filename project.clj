@@ -14,12 +14,12 @@
                    :repositories {"stuartsierra-releases" "http://stuartsierra.com/maven2"
                                   "stuartsierra-snapshots" "http://stuartsierra.com/m2snapshots"}}}
   
-  :plugins [[com.keminglabs/cljx "0.1.0-SNAPSHOT"]]
+  :plugins [[com.keminglabs/cljx "0.1.0"]]
 
   :source-paths ["src/clj" "src/cljs"
                  ;;See src/cljx/README.markdown
                  ".generated/clj" ".generated/cljs"]
-
+  
   :cljx {:builds [{:source-paths ["src/cljx"]
                    :output-path ".generated/clj"
                    :rules cljx.rules/clj-rules}
@@ -27,4 +27,7 @@
                   {:source-paths ["src/cljx"]
                    :output-path ".generated/cljs"
                    :extension "cljs"
-                   :rules cljx.rules/cljs-rules}]})
+                   :rules cljx.rules/cljs-rules}]}
+  
+  ;;generate cljx before JAR
+  :hooks [cljx.hooks])
