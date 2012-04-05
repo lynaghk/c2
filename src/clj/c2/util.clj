@@ -11,8 +11,11 @@
   `(do (.log js/console (pr-str ~x))
        ~x))
 
-(defmacro timeout [delay f] `(js/setTimeout ~f ~delay))
-(defmacro interval [delay f] `(js/setInterval ~f ~delay))
+(defmacro timeout [delay & body]
+  `(js/setTimeout (fn [] ~@body) ~delay))
+(defmacro interval [delay & body]
+  `(js/setInterval (fn [] ~@body) ~delay))
+
 (defmacro half [x] `(/ ~x 2))
 
 (defn mapply
