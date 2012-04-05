@@ -2,7 +2,7 @@
   (:use-macros [c2.util :only [p timeout]]
                [iterate :only [iter]])
   (:use [cljs.reader :only [read-string]]
-        [c2.dom :only [select node-type append! remove! children build-dom-elem merge-dom! attr cannonicalize]])
+        [c2.dom :only [select select-all node-type append! remove! children build-dom-elem merge-dom! attr cannonicalize]])
   (:require [goog.dom :as gdom]
             [clojure.set :as set]
             [clojure.string :as string]))
@@ -120,7 +120,7 @@ Optional enter, update, and exit functions called before DOM is changed; return 
                                                                             :idx i
                                                                             :datum datum}]))
                                                     (if selector
-                                                      (select selector container)
+                                                      (select-all selector container)
                                                       (children container))))]
 
     ;;Remove any stale nodes
