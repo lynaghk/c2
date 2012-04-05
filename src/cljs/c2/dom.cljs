@@ -59,6 +59,13 @@
     (gdom/appendChild (select container) el)
     el))
 
+(defn prepend! [container el]
+  (let [el (if (dom-element? el)
+             el
+             (build-dom-elem el))]
+    (gdom/insertChildAt (select container) el 0)
+    el))
+
 (defn remove! [el]
   (gdom/removeNode (select el)))
 
