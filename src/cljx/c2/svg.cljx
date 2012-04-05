@@ -33,22 +33,21 @@ Direction away from the data frame is defined to be positive; use negative margi
                        major-tick-width 6
                        text-margin 9}}]
 
-  (let [[x y x1 x2 y1 y2] (case orientation
-                            (:left :right) [:x :y :x1 :x2 :y1 :y2]
-                            (:top :bottom) [:y :x :y1 :y2 :x1 :x2])
+  (let [[x y x1 x2 y1 y2] (match [orientation]
+                                 [(:or :left :right)] [:x :y :x1 :x2 :y1 :y2]
+                                 [(:or :top :bottom)] [:y :x :y1 :y2 :x1 :x2])
 
-        parity (case orientation
-                 (:left :top) -1
-                 (:right :bottom) 1)]
+        parity (match [orientation]
+                      [(:or :left :top)] -1
+                      [(:or :right :bottom)] 1)]
 
-    [:g.axis {:class (name orientation)}
-     [:line.rule (apply hash-map (interleave [y1 y2] (:range scale)))]
-
-     (map (fn [d]
+    (into [:g.axis {:class (name orientation)}
+           [:line.rule (apply hash-map (interleave [y1 y2] (:range scale)))]]
+           (map (fn [d]
             [:g.major-tick {:transform (translate {x 0 y (scale d)})}
              [:text {x (* parity text-margin)} (formatter d)]
              [:line {x1 0 x2 (* parity major-tick-width)}]])
-          ticks)]))
+          ticks))))
 
 
 (def ArcMax (- Tau 0.0000001))
