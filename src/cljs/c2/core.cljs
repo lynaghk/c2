@@ -7,17 +7,6 @@
             [clojure.set :as set]
             [clojure.string :as string]))
 
-;;Lil' helpers
-(defn translate [x y]
-  {:transform (str "translate(" x "," y ")")})
-
-
-
-;;This should be replaced by a macro in c2.util once I figure out how to get macros to generate separate code for CLJ vs. CLJS.
-(defn dont-carity [f & args]
-  (apply f args))
-
-
 ;;DOM-ish methods
 (extend-type js/NodeList
   ISeqable
@@ -156,22 +145,3 @@ Optional enter, update, and exit functions called before DOM is changed; return 
       ;;Give the browser 10 ms to get its shit together, if the post-fn involves advanced layout.
       ;;Without this delay, CSS3 animations sometimes don't happen.
       (timeout 10 #(post-fn data)))))
-
-
-(defn instantiate-attrs
-  "Evaluates values in an attribute map by passing them the provided datum and index."
-  [attrs d idx]
-  (into {} (for [[k v] attrs]
-             (let [v (cond
-                      (keyword? v) (v d)
-                      (fn? v) (dont-carity v d idx)
-                      :else v)]
-               [k v]))))
-
-(defn snode
-  "Returns a function of [datum, index] that builds `tag` nodes with the specified attributes
-The attribute values themselves can be functions of [datum, index]."
-  [tag attrs]
-  (fn [datum idx]
-    [tag (instantiate-attrs attrs datum idx)]))
-
