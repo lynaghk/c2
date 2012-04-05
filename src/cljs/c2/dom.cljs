@@ -4,6 +4,7 @@
                [iterate :only [iter]])
   (:require [clojure.string :as string]
             [goog.dom :as gdom]
+            [goog.dom.classes :as gclasses]
             [goog.style :as gstyle]))
 
 ;; From Weavejester's Hiccup.
@@ -92,6 +93,11 @@
 
 (defn text [el v]
   (gdom/setTextContent el v))
+
+(defn classed!
+  "Adds or removes `class` to `el` based on boolean `classed?`."
+  [el class classed?]
+  (gclasses/enable (select el) class classed?))
 
 (def request-animation-frame
   (or (.-requestAnimationFrame js/window)
