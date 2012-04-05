@@ -13,6 +13,7 @@
 (def xmlns {:xhtml "http://www.w3.org/1999/xhtml"
             :svg "http://www.w3.org/2000/svg"})
 
+(def svg-tags #{:svg :g :rect :circle :clipPath :path :line :polygon :polyline :text :textPath})
 
 (defn dom-element? [x]
   (not (undefined? (.-nodeName x))))
@@ -130,7 +131,11 @@
                                                        ns-xmlns (xmlns (keyword nsp))]
                                                    (if t
                                                      [(or ns-xmlns nsp) (keyword t)]
-                                                     [(:xhtml xmlns) (keyword nsp)]))
+                                                     (let [tag (keyword nsp)]
+                                                       [(if (svg-tags tag)
+                                                          (:svg xmlns)
+                                                          (:xhtml xmlns))
+                                                        tag])))
                                    tag-attrs        (into {}
                                                           (filter #(not (nil? (second %)))
                                                                   {:id (or id nil)
