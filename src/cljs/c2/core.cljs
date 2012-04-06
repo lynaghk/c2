@@ -66,7 +66,7 @@ Automatically updates elements mapped to data according to key-fn (defaults to i
 Scoped to selector, if given, otherwise applies to all container's children.
 Optional enter, update, and exit functions called before DOM is changed; return false to prevent default behavior."
   [container data mapping & {:keys [selector key-fn pre-fn post-fn update exit enter
-                                    defer-attr]
+                                    defer-attr force-update]
                              :or {key-fn (fn [d idx] idx)
                                   enter  (fn [d idx new-node]
                                            #_(p "no-op enter called")
@@ -94,7 +94,8 @@ Optional enter, update, and exit functions called before DOM is changed; return 
                                         :exit exit
                                         :pre-fn pre-fn
                                         :post-fn post-fn
-                                        :defer-attr defer-attr)))
+                                        :defer-attr defer-attr
+                                        :force-update force-update)))
                    @data)
                data)
         
@@ -129,7 +130,7 @@ Optional enter, update, and exit functions called before DOM is changed; return 
                 ;;append it (effectively moving it to the correct index in the container)
                 (append! container (:node old))
                 ;;If its data is not equal to the new data, update it
-                (if (not= d (:datum old))
+                (if (or (not= d (:datum old)) force-update)
                   (if (update d idx (:node old) new-node)
                     (merge-dom! (:node old) new-node
                                 :defer-attr defer-attr))))
