@@ -31,7 +31,7 @@ There's also a two minute [screencast](https://www.youtube.com/watch?v=Urg79FmQn
 
 To use from Clojure/ClojureScript add this to your `project.clj`:
 
-    [com.keminglabs/c2 "0.1.0-beta1"]
+    [com.keminglabs/c2 "0.1.0-beta2-SNAPSHOT"]
 
 For ClojureScript development, I highly recommend using [lein-cljsbuild](https://github.com/emezeske/lein-cljsbuild).
 
@@ -53,8 +53,12 @@ Run
 
 to start a test watcher, which will automatically reload namespaces and run tests when source or test files are changed.   
 
-For ClojureScript-specific integration testing, use our highly advanced, PhantomJS-powered "list-of-assertions" testing framework:
+For ClojureScript-specific integration testing, you can run our highly advanced, PhantomJS-powered "list-of-assertions" testing framework:
 
-    cake run script/compile_tests.clj && phantomjs test/integration/runner.coffee
+    lein cljsbuild test
 
-or, if you're too cool to go headless, open up `test/integration/runner.html` in your browser.
+or, if you're too cool to go headless:
+
+    lein cljsbuild once
+
+then open up `test/integration/runner.html` in your browser.
