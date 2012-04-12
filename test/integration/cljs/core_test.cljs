@@ -1,5 +1,5 @@
 (ns c2.core-test
-  (:use-macros [helpers :only [p profile]])
+  (:use-macros [c2.util :only [p profile]])
   (:require [c2.svg :as svg])
   (:use [c2.core :only [unify!]]
         [c2.dom :only [attr children]]))
@@ -20,15 +20,14 @@
   (set! (.-innerHTML svg-container) ""))
 
 
-
 (print "\n\nSingle node enter/update/exit\n=============================")
 (let [n 100
-      mapping (fn [d idx] [:span {:x d} (str d)])]
+      mapping (fn [d] [:span {:x d} (str d)])]
   
   (profile (str "ENTER single tag with " n " data")
            (unify! container (range n) mapping))
   (let [children (children container)
-        fel       (first children)]
+        fel      (first children)]
     (assert (= n (count children)))
     (assert (= "span" (.toLowerCase (.-nodeName fel))))
     (assert (= "0" (:x (attr fel)))))

@@ -12,17 +12,17 @@
         (invoke [_ x] (let [domain-length (- (last domain) (first domain))
                             range-length (- (last range) (first range))]
                         (+ (first range)
-                                         (* range-length
-                                            (/ (- x (first domain))
-                                               domain-length))))))
+                           (* range-length
+                              (/ (- x (first domain))
+                                 domain-length))))))
 
 (c2-obj log {:domain [1 10]
              :range  [0 1]}
         clojure.lang.IFn
         (invoke [_ x]
                 ((comp (linear :domain (map log10 domain)
-                                :range range)
-                        log10) x)))
+                               :range range)
+                       log10) x)))
 
 
 

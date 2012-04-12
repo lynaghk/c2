@@ -10,3 +10,5 @@ build
 resources/*
 out/
 .generated
+.lein*
+vm/
