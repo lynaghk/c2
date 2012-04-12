@@ -147,10 +147,16 @@
                                                                   {:id (or id nil)
                                                                    :class (if class (string/replace class #"\." " "))}))
                                    map-attrs        (first content)]
-
-                               (if (map? map-attrs)
-                                 {:nsp nsp :tag tag :attr (merge tag-attrs map-attrs) :children  (map cannonicalize (next content))}
-                                 {:nsp nsp :tag tag :attr tag-attrs :children  (map cannonicalize content)}))))
+                               
+                               (let [[attr raw-children] (if (map? map-attrs)
+                                                                [(merge tag-attrs map-attrs) (next content)]
+                                                                [tag-attrs content])
+                                     ;;Explode children seqs in place
+                                     children (mapcat #(if (and (not (vector? %)) (seq? %))
+                                                         (map cannonicalize %)
+                                                         [(cannonicalize %)])
+                                                      raw-children)]
+                                 {:nsp nsp :tag tag :attr attr :children children}))))
 
 (defn create-elem [nsp tag]
   (.createElementNS js/document nsp (name tag)))
