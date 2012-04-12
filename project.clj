@@ -42,7 +42,8 @@
                               :compiler {:output-to "out/test/integration.js"
                                          :optimizations :whitespace
                                          :pretty-print true}}}
-              :test-commands {"integration" ["phantomjs test/integration/runner.coffee"]}}
+              :test-commands {"integration" ["phantomjs"
+                                             "test/integration/runner.coffee"]}}
 
 
   ;;generate cljx before JAR
