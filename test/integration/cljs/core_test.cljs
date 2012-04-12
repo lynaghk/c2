@@ -1,11 +1,10 @@
 (ns c2.core-test
-  (:use-macros [c2.util :only [p profile]])
+  (:use-macros [c2.util :only [p pp profile]])
   (:require [c2.svg :as svg])
   (:use [c2.core :only [unify!]]
         [c2.dom :only [attr children]]))
 
-(defn *print-fn* [x]
-  (.log js/console x))
+(set! *print-fn* #(.log js/console %))
 
 (def xhtml "http://www.w3.org/1999/xhtml")
 
@@ -31,7 +30,6 @@
     (assert (= n (count children)))
     (assert (= "span" (.toLowerCase (.-nodeName fel))))
     (assert (= "0" (:x (attr fel)))))
-
 
   (profile (str "UPDATE single tag, reversing order")
            (unify! container (reverse (range n)) mapping))
@@ -76,11 +74,5 @@
              (:val (attr (first (children container)))))))
 
 (clear!)
-
-
-;;Axis component
-(let [s #(* 10 %)]
-  (svg/axis svg-container s
-            :ticks [1 2 3]))
 
 (print "\n\nHurray, no errors!")
