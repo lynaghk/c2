@@ -4,12 +4,14 @@
   `(goog.typeOf ~x))
 
 (defmacro p [x]
-  `(do (.log js/console ~x)
-       ~x))
+  `(let [res# ~x]
+     (.log js/console res#)
+     res#))
 
 (defmacro pp [x]
-  `(do (.log js/console (pr-str ~x))
-       ~x))
+  `(let [res# ~x]
+     (.log js/console (prn-str res#))
+     res#))
 
 (defmacro timeout [delay & body]
   `(js/setTimeout (fn [] ~@body) ~delay))
