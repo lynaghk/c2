@@ -13,6 +13,12 @@
      (.log js/console (prn-str res#))
      res#))
 
+(defmacro profile [descr & body]
+  `(let [start# (.getTime (js/Date.) ())
+         ret# (do ~@body)]
+    (print (str ~descr ": " (- (.getTime (js/Date.) ()) start#) " msecs"))
+    ret#))
+
 (defmacro timeout [delay & body]
   `(js/setTimeout (fn [] ~@body) ~delay))
 (defmacro interval [delay & body]

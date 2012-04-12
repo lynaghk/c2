@@ -1,9 +1,8 @@
 (ns c2.dom-test
-  (:use-macros [helpers :only [p profile]])
+  (:use-macros [c2.util :only [p pp profile]])
   (:use [c2.dom :only [attr build-dom-elem]]))
 
-(defn *print-fn* [x]
-  (.log js/console x))
+(set! *print-fn* #(.log js/console %))
 
 (def xhtml "http://www.w3.org/1999/xhtml")
 
@@ -12,10 +11,6 @@
 (.appendChild (.querySelector js/document "html") container)
 
 (defn clear! [] (set! (.-innerHTML container) ""))
-
-
-
-
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -29,4 +24,9 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;DOM Element creation from vectors
+(assert (= "<p><span>hello</span><i>0</i><i>1</i><i>2</i></p>"
+           (.-outerHTML (build-dom-elem [:p [:span "hello"]
+                                         (map #(vector :i %) (range 3))]))))
 
+
+(clear!)
