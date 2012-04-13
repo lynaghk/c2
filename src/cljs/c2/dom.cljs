@@ -121,7 +121,8 @@
       (text dom-node txt))
     (iter {for [dom-child el-child] in (map vector (children dom-node)
                                             (remove string? (:children el)))}
-          (merge-dom! dom-child el-child :defer-attr defer-attr))))
+          (merge-dom! dom-child el-child :defer-attr defer-attr))
+    dom-node))
 
 (defn cannonicalize
   "Parse hiccup-like vec into map of {:tag :attr :children}, or return string as itself.

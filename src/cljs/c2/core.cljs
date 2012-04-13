@@ -22,27 +22,22 @@
     ;;(.-outerHTML x)
     x))
 
-;;Attach data in Clojure reader readable format to the DOM.
-;;Use data-* attr rather than trying to set as a property.
-;;See http://dev.w3.org/html5/spec/Overview.html#attr-data
 (def node-data-key "c2")
 (defmulti attach-data (fn [node d] (node-type node)))
 (defmethod attach-data :chiccup [node d]
-  (assoc-in node [:attr (str "data-" node-data-key)]
-            (binding [*print-dup* true] (pr-str d))))
+  (assoc node :data
+         (binding [*print-dup* true] (pr-str d))))
 
 (defmethod attach-data :dom [node d]
-  (attr node (str "data-" node-data-key)
-        (binding [*print-dup* true] (pr-str d))))
+  (set! (.-__c2data__ node) d)
+  node)
 
 (defmulti read-data (fn [node] (node-type node)))
 (defmethod read-data :chiccup [node]
-  (read-string (get-in node [:attr (str "data-" node-data-key)])))
+  (read-string (:data node)))
 (defmethod read-data :dom [node]
-  (if-let [data-str (aget (.-dataset node)
-                          node-data-key)]
-    (if (not= "" data-str)
-      (read-string data-str))))
+  (let [d (.-__c2data__ node)]
+    (if (undefined? d) nil d)))
 
 
 ;; (defmulti unify!
@@ -98,7 +93,7 @@ Optional enter, update, and exit functions called before DOM is changed; return 
                                         :force-update force-update)))
                    @data)
                data)
-        
+
         data (if pre-fn
                (pre-fn data)
                data)
@@ -123,7 +118,7 @@ Optional enter, update, and exit functions called before DOM is changed; return 
 
     ;;For each datum, update existing nodes and add new ones
     (iter {for [idx d] in (map-indexed vector data)}
-          (let [new-node (attach-data (cannonicalize (mapping d idx)) d)]
+          (let [new-node (cannonicalize (mapping d idx))]
             ;;If there's an existing node
             (if-let [old (existing-nodes-by-key (key-fn d idx))]
               (do
@@ -132,11 +127,13 @@ Optional enter, update, and exit functions called before DOM is changed; return 
                 ;;If its data is not equal to the new data, update it
                 (if (or (not= d (:datum old)) force-update)
                   (if (update d idx (:node old) new-node)
-                    (merge-dom! (:node old) new-node
-                                :defer-attr defer-attr))))
+                    (attach-data (merge-dom! (:node old) new-node
+                                             :defer-attr defer-attr)
+                                 d))))
 
               ;;instantiate new node on the DOM so it can be manipulated in the user-specified `enter` fn.
               (let [new-dom-node (append! "body" new-node)]
+                (attach-data new-dom-node d)
                 (if (enter d idx new-dom-node)
                   (append! container new-dom-node) ;;move new node to container
                   (remove! new-dom-node))))))
