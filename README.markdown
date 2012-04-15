@@ -33,7 +33,9 @@ To use from Clojure/ClojureScript add this to your `project.clj`:
 
     [com.keminglabs/c2 "0.1.0-beta2-SNAPSHOT"]
 
+Because the complex classpath setup, Leiningen 2.0.0 is required.
 For ClojureScript development, I highly recommend using [lein-cljsbuild](https://github.com/emezeske/lein-cljsbuild).
+
 
 Roadmap
 =======
