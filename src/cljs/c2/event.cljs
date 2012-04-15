@@ -1,6 +1,6 @@
 (ns c2.event
   (:use [cljs.reader :only [read-string]]
-        [c2.core :only [read-data dont-carity node-type]])
+        [c2.core :only [read-data node-type]])
   (:require [c2.dom :as dom]
             [goog.events :as gevents]))
 
@@ -26,7 +26,7 @@
                          (loop [node (.-target event)]
                            (if-let [d (read-data node)]
                              ;;Then, call the handler on this node
-                             (dont-carity f d node event)
+                             (f d node event)
                              (if-let [parent (dom/parent node)]
                                (recur parent)))))))))
 
