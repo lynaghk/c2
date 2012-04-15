@@ -76,7 +76,13 @@
   ([el x] (match [x]
                  [(k :when keyword?)] (gstyle/getComputedStyle el (name k))
                  [(m :when map?)] (doseq [[k v] m] (style el k v))))
-  ([el k v] (gstyle/setStyle el (name k) v)))
+  ([el k v] (gstyle/setStyle el (name k)
+                             (match [v]
+                                    [s :when string?] s
+                                    [n :when number?]
+                                    (if (#{:height :width :top :left :bottom :right} (keyword k))
+                                      (str n "px")
+                                      n)))))
 
 (defn attr
   ([el] (let [attrs (.-attributes el)]
