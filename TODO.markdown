@@ -11,7 +11,8 @@ Declarative behavior?
 
 Is it possible to use pre/post conditions in development, but then strip them out when compiling to JS to save space?
 
-Build tooling around Lein cljsbuild to juggle "cljx" files into valid Clojure/ClojureScript.
+ticks#search should take optional kwarg to find ticks that are a proper subset or superset of the data range
+
 
 Visual REPL
 -----------

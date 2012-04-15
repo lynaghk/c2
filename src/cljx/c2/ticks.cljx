@@ -78,7 +78,7 @@
 
 (defn search
   "Find best ticks for the data range (d-min, d-max) and target label density.
-Returns a map with {:min :max :step} of optimal labeling, if one is found.
+Returns a map with {:min :max :step :extent} of optimal labeling, if one is found.
 Returns an empty map if no labelings can be found.
 
 target-density: labels per length; defaults to 0.01---one label per 100 units
@@ -132,8 +132,10 @@ length: available label spacing
                                     (reset! label {:min l-min
                                                    :max l-max
                                                    :step l-step})))))))
-
-    @label))
+    (let [l @label]
+      (assoc l
+        :extent [(min (:min l) d-min)
+                 (max (:max l) d-max)]))))
 
 
 (comment
