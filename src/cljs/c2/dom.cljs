@@ -51,7 +51,7 @@
 
 
 (declare build-dom-elem)
-(declare cannonicalize)
+(declare canonicalize)
 
 
 (defn append! [container el]
@@ -114,7 +114,7 @@
   "Walks an existing dom-node and makes sure that it has the same attributes and children as the given el."
   [dom-node el & {:keys [defer-attr]
                   :or {defer-attr false}}]
-  (let [el (cannonicalize el)]
+  (let [el (canonicalize el)]
     (when (not= (.toLowerCase (.-nodeName dom-node))
                 (.toLowerCase (name (:tag el))))
       (throw "Cannot merge el into node of a different type"))
@@ -130,7 +130,7 @@
           (merge-dom! dom-child el-child :defer-attr defer-attr))
     dom-node))
 
-(defn cannonicalize
+(defn canonicalize
   "Parse hiccup-like vec into map of {:tag :attr :children}, or return string as itself.
    Based on Pinot's html/normalize-element."
   [x]
@@ -160,8 +160,8 @@
                                                                 [tag-attrs content])
                                      ;;Explode children seqs in place
                                      children (mapcat #(if (and (not (vector? %)) (seq? %))
-                                                         (map cannonicalize %)
-                                                         [(cannonicalize %)])
+                                                         (map canonicalize %)
+                                                         [(canonicalize %)])
                                                       raw-children)]
                                  {:nsp nsp :tag tag :attr attr :children children}))))
 
@@ -171,7 +171,7 @@
 (defn build-dom-elem [el]
   (match [el]
          [(s :when string?)] (gdom/createTextNode s)
-         [(v :when vector?)] (recur (cannonicalize v))
+         [(v :when vector?)] (recur (canonicalize v))
          [(m :when map?)] ;;Can't use {:keys [...]} destructuring in place of m in this clause. Why?
          (let [{:keys [nsp tag children] :as elm} m
                elem (create-elem nsp tag)]
