@@ -1,13 +1,12 @@
 (ns c2.core
-  (:use-macros [c2.util :only [p timeout]]
-               [iterate :only [iter]])
+  (:use-macros [c2.util :only [p timeout]])
   (:use [cljs.reader :only [read-string]]
         [c2.dom :only [select select-all node-type append! remove! children build-dom-elem merge-dom! attr cannonicalize]])
   (:require [goog.dom :as gdom]
             [clojure.set :as set]
             [clojure.string :as string]))
 
-;;DOM-ish methods
+;;Seq over native JavaScript node collections
 (extend-type js/NodeList
   ISeqable
   (-seq [array] (array-seq array 0)))
@@ -18,9 +17,7 @@
 ;;This is required so that DOM nodes can be used in sets
 (extend-type js/Node
   IHash
-  (-hash [x]
-    ;;(.-outerHTML x)
-    x))
+  (-hash [x] x))
 
 (def node-data-key "c2")
 (defmulti attach-data (fn [node d] (node-type node)))
@@ -109,34 +106,34 @@ Optional enter, update, and exit functions called before DOM is changed; return 
                                                       (children container))))]
 
     ;;Remove any stale nodes
-    (iter {for k in (set/difference (set (keys existing-nodes-by-key))
-                                    (set (map key-fn data (range))))}
-          (let [{:keys [node idx datum]} (existing-nodes-by-key k)]
-            (if (exit datum idx node)
-              (remove! node))))
+    (doseq [k (set/difference (set (keys existing-nodes-by-key))
+                              (set (map key-fn data (range))))]
+      (let [{:keys [node idx datum]} (existing-nodes-by-key k)]
+        (if (exit datum idx node)
+          (remove! node))))
 
 
     ;;For each datum, update existing nodes and add new ones
-    (iter {for [idx d] in (map-indexed vector data)}
-          (let [new-node (cannonicalize (mapping d idx))]
-            ;;If there's an existing node
-            (if-let [old (existing-nodes-by-key (key-fn d idx))]
-              (do
-                ;;append it (effectively moving it to the correct index in the container)
-                (append! container (:node old))
-                ;;If its data is not equal to the new data, update it
-                (if (or (not= d (:datum old)) force-update)
-                  (if (update d idx (:node old) new-node)
-                    (attach-data (merge-dom! (:node old) new-node
-                                             :defer-attr defer-attr)
-                                 d))))
+    (doseq [[idx d] (map-indexed vector data)]
+      (let [new-node (cannonicalize (mapping d idx))]
+        ;;If there's an existing node
+        (if-let [old (existing-nodes-by-key (key-fn d idx))]
+          (do
+            ;;append it (effectively moving it to the correct index in the container)
+            (append! container (:node old))
+            ;;If its data is not equal to the new data, update it
+            (if (or (not= d (:datum old)) force-update)
+              (if (update d idx (:node old) new-node)
+                (attach-data (merge-dom! (:node old) new-node
+                                         :defer-attr defer-attr)
+                             d))))
 
-              ;;instantiate new node on the DOM so it can be manipulated in the user-specified `enter` fn.
-              (let [new-dom-node (append! "body" new-node)]
-                (attach-data new-dom-node d)
-                (if (enter d idx new-dom-node)
-                  (append! container new-dom-node) ;;move new node to container
-                  (remove! new-dom-node))))))
+          ;;instantiate new node on the DOM so it can be manipulated in the user-specified `enter` fn.
+          (let [new-dom-node (append! "body" new-node)]
+            (attach-data new-dom-node d)
+            (if (enter d idx new-dom-node)
+              (append! container new-dom-node) ;;move new node to container
+              (remove! new-dom-node))))))
 
     ;;Run post-fn, if it was given
     (if post-fn

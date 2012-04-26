@@ -40,7 +40,7 @@
 
   :cljsbuild {:builds {:test {:source-path "test/integration/cljs"
                               :compiler {:output-to "out/test/integration.js"
-                                         :optimizations :whitespace
+                                         :optimizations :simple
                                          :pretty-print true}}}
               :test-commands {"integration" ["phantomjs"
                                              "test/integration/runner.coffee"]}}
