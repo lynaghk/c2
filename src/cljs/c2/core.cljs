@@ -1,7 +1,7 @@
 (ns c2.core
   (:use-macros [c2.util :only [p pp timeout]])
   (:use [cljs.reader :only [read-string]]
-        [c2.dom :only [select select-all node-type append! remove! children build-dom-elem merge-dom! attr cannonicalize]])
+        [c2.dom :only [select select-all node-type append! remove! children build-dom-elem merge-dom!]])
   (:require [goog.dom :as gdom]
             [clojure.set :as set]
             [clojure.string :as string]))
@@ -100,7 +100,7 @@ If data implements IWatchable, DOM will update when data changes."
 
     ;;For each datum, update existing nodes and add new ones
     (doseq [[idx d] (map-indexed vector data)]
-      (let [new-node (cannonicalize (mapping d idx))]
+      (let [new-node (mapping d idx)]
         ;;If there's an existing node
         (if-let [old (existing-nodes-by-key (key-fn d idx))]
           (do
