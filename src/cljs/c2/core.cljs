@@ -44,8 +44,16 @@
 (defmulti unify!
   "Given container, data, and mapping-fn, calls (mapping datum idx) for each datum and appends resulting elements to container.
 Automatically updates elements mapped to data according to key-fn (defaults to index) and removes elements that don't match.
-Scoped to selector kwarg, if given, otherwise applies to all container's children.
-Optional enter, update, and exit functions called before DOM is changed; return false to prevent default behavior.
+Scoped to :selector kwarg if given, otherwise applies to all container's children.
+
+Optional kwargs fns (args prefixed with $ are live DOM nodes):
+
+  (enter d idx $node)
+  (update d idx $old new)
+  (exit d idx $node)
+
+called before DOM changed; return false to prevent default behavior.
+
 If data implements IWatchable, DOM will update when data changes."
   (fn [container data mapping & kwargs]
     (cond (satisfies? cljs.core.IWatchable data) :atom
@@ -68,28 +76,15 @@ If data implements IWatchable, DOM will update when data changes."
   [container data mapping & {:keys [selector key-fn pre-fn post-fn update exit enter
                                     defer-attr force-update]
                              :or {key-fn (fn [d idx] idx)
-                                  enter  (fn [d idx new-node]
-                                           #_(p "no-op enter called")
-                                           true)
-                                  update (fn [d idx old-node new-node]
-                                           #_(p "no-op update called")
-                                           true)
-                                  exit   (fn [d idx old-node]
-                                           #_(p "default remove called")
-                                           true)
                                   defer-attr false}}]
 
   (let [container (select container)
-        data (if pre-fn
-               (pre-fn data)
-               data)
-
-
-        existing-nodes-by-key (into {} (map-indexed (fn [i node]
+        data (if pre-fn (pre-fn data) data)
+        existing-nodes-by-key (into {} (map-indexed (fn [idx node]
                                                       (let [datum (read-data node)]
-                                                        [(key-fn datum i)  {:node node
-                                                                            :idx i
-                                                                            :datum datum}]))
+                                                        [(key-fn datum idx) {:node node
+                                                                             :idx idx
+                                                                             :datum datum}]))
                                                     (if selector
                                                       (select-all selector container)
                                                       (children container))))]
@@ -98,7 +93,8 @@ If data implements IWatchable, DOM will update when data changes."
     (doseq [k (set/difference (set (keys existing-nodes-by-key))
                               (set (map key-fn data (range))))]
       (let [{:keys [node idx datum]} (existing-nodes-by-key k)]
-        (if (exit datum idx node)
+        (when (or (nil? exit)
+                  (exit datum idx node))
           (remove! node))))
 
 
@@ -110,19 +106,20 @@ If data implements IWatchable, DOM will update when data changes."
           (do
             ;;append it (effectively moving it to the correct index in the container)
             (append! container (:node old))
-            ;;If its data is not equal to the new data, update it
-            (if (or (not= d (:datum old)) force-update)
-              (if (update d idx (:node old) new-node)
-                (attach-data (merge-dom! (:node old) new-node
-                                         :defer-attr defer-attr)
-                             d))))
+            (when (and (or (not= d (:datum old))
+                           force-update)
+                       (or (nil? update)
+                           (update d idx (:node old) new-node)))
+              (attach-data (merge-dom! (:node old) new-node
+                                       :defer-attr defer-attr)
+                           d)))
 
-          ;;instantiate new node on the DOM so it can be manipulated in the user-specified `enter` fn.
-          (let [new-dom-node (append! "body" new-node)]
-            (attach-data new-dom-node d)
-            (if (enter d idx new-dom-node)
-              (append! container new-dom-node) ;;move new node to container
-              (remove! new-dom-node))))))
+          (let [$new-node (-> new-node
+                              (build-dom-elem)
+                              (attach-data d))]
+            (when (or (nil? enter)
+                      (enter d idx $new-node))
+              (append! container $new-node))))))
 
     ;;Run post-fn, if it was given
     (if post-fn
