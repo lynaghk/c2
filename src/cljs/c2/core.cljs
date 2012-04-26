@@ -1,5 +1,5 @@
 (ns c2.core
-  (:use-macros [c2.util :only [p timeout]])
+  (:use-macros [c2.util :only [p pp timeout]])
   (:use [cljs.reader :only [read-string]]
         [c2.dom :only [select select-all node-type append! remove! children build-dom-elem merge-dom! attr cannonicalize]])
   (:require [goog.dom :as gdom]
@@ -37,26 +37,34 @@
     (if (undefined? d) nil d)))
 
 
-;; (defmulti unify!
-;;   (fn [_ data & args]
-;;     (cond (instance? cljs.core.Atom data) :atom
-;;           (seq? data)                        :seq
-;;           :else                              (throw (js/Error. "Unify! requires data to be seqable or an atom containing seqable")))))
-;; (defmethod unify! :atom
-;;   [_ atom-data & args]
-;;   (apply unify! _ @atom-data args))
-
-;;(defmethod unify! :seq)
-
-
 ;;Used to generate unique IDs for auto-unify atom watchers
 (def ^:private auto-unify-id (atom 0))
 
-(defn unify!
-  "Calls (mapping datum idx) for each datum and appends resulting elements to container.
+
+(defmulti unify!
+  "Given container, data, and mapping-fn, calls (mapping datum idx) for each datum and appends resulting elements to container.
 Automatically updates elements mapped to data according to key-fn (defaults to index) and removes elements that don't match.
-Scoped to selector, if given, otherwise applies to all container's children.
-Optional enter, update, and exit functions called before DOM is changed; return false to prevent default behavior."
+Scoped to selector kwarg, if given, otherwise applies to all container's children.
+Optional enter, update, and exit functions called before DOM is changed; return false to prevent default behavior.
+If data implements IWatchable, DOM will update when data changes."
+  (fn [container data mapping & kwargs]
+    (cond (satisfies? cljs.core.IWatchable data) :atom
+          (satisfies? cljs.core.ISeqable data)   :seq
+          :else (do (pp data)
+                    (throw (js/Error. "Unify! requires data to be seqable or an atom containing seqable"))))))
+
+(defmethod unify! :atom
+  [container !data & args]
+  (let [redraw! #(apply unify! container % args)]
+    ;;add watcher to redraw whenever atom is update
+    (add-watch !data (keyword (str "auto-unify" (swap! auto-unify-id inc)))
+               (fn [_ _ old new] (when (not= old new)
+                                  (redraw! new))))
+    ;;initial draw
+    (redraw! @!data)))
+
+
+(defmethod unify! :seq
   [container data mapping & {:keys [selector key-fn pre-fn post-fn update exit enter
                                     defer-attr force-update]
                              :or {key-fn (fn [d idx] idx)
@@ -72,25 +80,6 @@ Optional enter, update, and exit functions called before DOM is changed; return 
                                   defer-attr false}}]
 
   (let [container (select container)
-        ;;This logic should be abstracted out via a (unify!) multimethod, once (apply multimethod) is fixed in ClojureScript
-        data (if (instance? cljs.core.Atom data)
-               ;;Then add a watcher to auto-unify when the atom changes, and deference data for this run
-               (do (add-watch data (keyword (str "auto-unify" (swap! auto-unify-id inc)))
-                              (fn [key data-atom old new]
-                                (p "atom updated; automatically calling unify!")
-                                (unify! container @data-atom mapping
-                                        :selector selector
-                                        :key-fn key-fn
-                                        :enter  enter
-                                        :update update
-                                        :exit exit
-                                        :pre-fn pre-fn
-                                        :post-fn post-fn
-                                        :defer-attr defer-attr
-                                        :force-update force-update)))
-                   @data)
-               data)
-
         data (if pre-fn
                (pre-fn data)
                data)
