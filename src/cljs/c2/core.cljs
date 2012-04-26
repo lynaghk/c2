@@ -1,7 +1,7 @@
 (ns c2.core
-  (:use-macros [c2.util :only [p pp timeout]])
+  (:use-macros [c2.util :only [p pp]])
   (:use [cljs.reader :only [read-string]]
-        [c2.dom :only [select select-all node-type append! remove! children build-dom-elem merge-dom!]])
+        [c2.dom :only [select select-all node-type append! remove! children build-dom-elem merge-dom! request-animation-frame]])
   (:require [goog.dom :as gdom]
             [clojure.set :as set]
             [clojure.string :as string]))
@@ -122,7 +122,7 @@ If data implements IWatchable, DOM will update when data changes."
               (append! container $new-node))))))
 
     ;;Run post-fn, if it was given
-    (if post-fn
+    (when post-fn
       ;;Give the browser 10 ms to get its shit together, if the post-fn involves advanced layout.
       ;;Without this delay, CSS3 animations sometimes don't happen.
-      (timeout 10 #(post-fn data)))))
+      (request-animation-frame #(post-fn data)))))
