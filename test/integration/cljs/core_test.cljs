@@ -22,7 +22,7 @@
 (print "\n\nSingle node enter/update/exit\n=============================")
 (let [n 100
       mapping (fn [d] [:span {:x d} (str d)])]
-  
+
   (profile (str "ENTER single tag with " n " data")
            (unify! container (range n) mapping))
   (let [children (children container)
@@ -39,7 +39,7 @@
     (assert (= "span" (.toLowerCase (.-nodeName fel))))
     (assert (= (str (dec n)) (:x (attr fel)))))
 
-  
+
   (profile (str "UPDATE single tag with new datum")
            (unify! container (range (inc n)) mapping))
   (assert (= (inc n) (count (children container))))
@@ -52,6 +52,31 @@
 
 
 (clear!)
+
+
+(print "\n\nAtom-updates on single node enter/update/exit\n=============================")
+(let [n 100
+      mapping (fn [d] [:span {:x d} (str d)])
+      !ds (atom (range n))]
+
+  (profile (str "ENTER single tag with " n " data")
+           (unify! container !ds mapping))
+  (let [children (children container)
+        fel      (first children)]
+    (assert (= n (count children)))
+    (assert (= "span" (.toLowerCase (.-nodeName fel))))
+    (assert (= "0" (:x (attr fel)))))
+
+  (profile (str "UPDATE single tag, reversing order")
+           (swap! !ds reverse))
+  (let [children (children container)
+        fel       (first children)]
+    (assert (= n (count children)))
+    (assert (= "span" (.toLowerCase (.-nodeName fel))))
+    (assert (= (str (dec n)) (:x (attr fel))))))
+
+(clear!)
+
 
 (print "\n\nMore complex dataset\n====================")
 (let [n 100
@@ -68,7 +93,7 @@
   (profile "UPDATE/EXIT node hiearchy"
            (unify! container (take 10 new-data) mapping
                    :key-fn :id))
-  
+
   (assert (= 10 (count (children container))))
   (assert (= (:val (first new-data))
              (:val (attr (first (children container)))))))
