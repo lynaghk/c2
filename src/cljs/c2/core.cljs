@@ -37,10 +37,6 @@
     (if (undefined? d) nil d)))
 
 
-;;Used to generate unique IDs for auto-unify atom watchers
-(def ^:private auto-unify-id (atom 0))
-
-
 (defmulti unify!
   "Given container, data, and mapping-fn, calls (mapping datum idx) for each datum and appends resulting elements to container.
 Automatically updates elements mapped to data according to key-fn (defaults to index) and removes elements that don't match.
@@ -65,7 +61,7 @@ If data implements IWatchable, DOM will update when data changes."
   [container !data & args]
   (let [redraw! #(apply unify! container % args)]
     ;;add watcher to redraw whenever atom is update
-    (add-watch !data (keyword (str "auto-unify" (swap! auto-unify-id inc)))
+    (add-watch !data (keyword (gensym "auto-unify!-"))
                (fn [_ _ old new] (when (not= old new)
                                   (redraw! new))))
     ;;initial draw
