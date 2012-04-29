@@ -108,7 +108,7 @@
 (def request-animation-frame
   (or (.-requestAnimationFrame js/window)
       (.-webkitRequestAnimationFrame js/window)
-      #(timeout 10 %)))
+      #(timeout 10 (%))))
 
 (defn merge-dom!
   "Walks an existing dom-node and makes sure that it has the same attributes and children as the given el."
