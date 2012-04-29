@@ -50,6 +50,11 @@
   [(apply min xs)
    (apply max xs)])
 
+(defn irange
+  "Same as core/range, but includes the end."
+  ([start] (range start))
+  ([start end] (concat (range start end) [end]))
+  ([start end step] (concat (range start end step) [end])))
 
 ;;element-by-element arithmetic
 ;;Code modified from Incanter
