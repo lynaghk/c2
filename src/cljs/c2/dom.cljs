@@ -105,6 +105,10 @@
   [el class classed?]
   (gclasses/enable (select el) class classed?))
 
+;;TODO: make these kind of shortcuts macros for better performance.
+(defn add-class! [el class] (classed! el class true))
+(defn remove-class! [el class] (classed! el class false))
+
 (def request-animation-frame
   (or (.-requestAnimationFrame js/window)
       (.-webkitRequestAnimationFrame js/window)
