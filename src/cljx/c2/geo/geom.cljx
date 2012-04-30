@@ -13,57 +13,54 @@
 (defn area [geo & {:keys [projection]
                    :or {projection identity}}]
 
-  (defn polygon-area [poly-coordinates]
-    (let [area (fn [coordinates]
-                 (abs (c2.geom.polygon/area (map projection coordinates))))]
+  (let [polygon-area (fn [poly-coordinates]
+                       (let [area (fn [coordinates]
+                                    (abs (c2.geom.polygon/area (map projection coordinates))))]
+                         ;;area of exterior boundary - interior holes
+                         (apply - (area (first poly-coordinates))
+                                (map area (rest poly-coordinates)))))]
+    (abs (match [geo]
+                [{:type "FeatureCollection" :features xs}]
+                (apply + (map area xs))
 
-      ;;area of exterior boundary - interior holes
-      (apply - (area (first poly-coordinates))
-             (map area (rest poly-coordinates)))))
+                [{:type "Feature" :geometry g}]
+                (area g)
 
-  (abs (match [geo]
-              [{:type "FeatureCollection" :features xs}]
-              (apply + (map area xs))
+                [{:type "Polygon" :coordinates xs}]
+                (polygon-area xs)
 
-              [{:type "Feature" :geometry g}]
-              (area g)
-
-              [{:type "Polygon" :coordinates xs}]
-              (polygon-area xs)
-
-              [{:type "MultiPolygon" :coordinates xs}]
-              (apply + (map polygon-area xs)))))
+                [{:type "MultiPolygon" :coordinates xs}]
+                (apply + (map polygon-area xs))))))
 
 
 (defn centroid [geo & {:keys [projection]
                        :or {projection identity}}]
 
-  (defn polygon-centroid
-    "Compute polygon centroid by geometric decomposition.
-     http://en.wikipedia.org/wiki/Centroid#By_geometric_decomposition"
-    [poly-coordinates]
-    (let [areas (map (fn [coordinates]
-                       (abs (c2.geom.polygon/area (map projection coordinates))))
-                     poly-coordinates)]
+  (let [polygon-centroid (fn [poly-coordinates]
+                           ;;Compute polygon centroid by geometric decomposition.
+                           ;;http://en.wikipedia.org/wiki/Centroid#By_geometric_decomposition
+                           (let [areas (map (fn [coordinates]
+                                              (abs (c2.geom.polygon/area (map projection coordinates))))
+                                            poly-coordinates)]
 
-      ;;Return hashmap containing the area so weighted centroid can be calculated for MultiPolygons.
-      {:centroid (div (apply sub (map (fn [coordinates area]
-                                        (mul (c2.geom.polygon/centroid coordinates)
-                                             area))
-                                      poly-coordinates areas))
-                      (apply - areas))
-       :area (apply + areas)}))
+                             ;;Return hashmap containing the area so weighted centroid can be calculated for MultiPolygons.
+                             {:centroid (div (apply sub (map (fn [coordinates area]
+                                                               (mul (c2.geom.polygon/centroid coordinates)
+                                                                    area))
+                                                             poly-coordinates areas))
+                                             (apply - areas))
+                              :area (apply + areas)}))]
 
-  (match [geo]
-         [{:type "Feature" :geometry g}]
-         (centroid g)
+    (match [geo]
+           [{:type "Feature" :geometry g}]
+           (centroid g)
 
-         [{:type "Polygon" :coordinates xs}]
-         (:centroid (polygon-centroid xs))
+           [{:type "Polygon" :coordinates xs}]
+           (:centroid (polygon-centroid xs))
 
-         [{:type "MultiPolygon" :coordinates xs}]
-         (let [centroids (map polygon-centroid xs)]
-           (div (apply add (map (fn [{:keys [centroid area]}]
-                                  (mul centroid area))
-                                centroids))
-                (apply add (map :area centroids))))))
+           [{:type "MultiPolygon" :coordinates xs}]
+           (let [centroids (map polygon-centroid xs)]
+             (div (apply add (map (fn [{:keys [centroid area]}]
+                                    (mul centroid area))
+                                  centroids))
+                  (apply add (map :area centroids)))))))
