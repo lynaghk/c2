@@ -1,4 +1,4 @@
-(ns c2.choropleth_test
+(ns c2.choropleth-test
   (:use-macros [c2.util :only [p pp profile]])
   (:use [c2.core :only [unify! style]]
         [c2.maths :only [extent floor]]
