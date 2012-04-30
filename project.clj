@@ -17,7 +17,8 @@
                                   "stuartsierra-snapshots" "http://stuartsierra.com/m2snapshots"}}}
 
   :plugins [[com.keminglabs/cljx "0.1.0"]
-            [lein-cljsbuild "0.1.6"]]
+            [lein-cljsbuild "0.1.6"]
+            [lein-midje "2.0.0-SNAPSHOT"]]
 
   :source-paths ["src/clj" "src/cljs"
                  ;;See src/cljx/README.markdown
