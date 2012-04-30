@@ -118,7 +118,4 @@ If data implements IWatchable, DOM will update when data changes."
               (append! container $new-node))))))
 
     ;;Run post-fn, if it was given
-    (when post-fn
-      ;;Give the browser 10 ms to get its shit together, if the post-fn involves advanced layout.
-      ;;Without this delay, CSS3 animations sometimes don't happen.
-      (request-animation-frame #(post-fn data)))))
+    (when post-fn (request-animation-frame #(post-fn data)))))
