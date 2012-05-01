@@ -21,6 +21,18 @@
          [{:x x :y y}] (recur [x y])))
 
 
+(defn ^:cljs get-bounds
+  "Returns map of {:x :y :width :height} containing SVG element bounding box.
+   All coordinates are in userspace. See: http://www.w3.org/TR/SVG/types.html#InterfaceSVGLocatable"
+  [$svg]
+  (let [b (.getBBox $svg)]
+    {:x (.-x b)
+     :y (.-y b)
+     :width (.-width b)
+     :height (.-height b)}))
+
+
+
 (defn axis
   "Returns axis <g> for input scale with ticks.
 Direction away from the data frame is defined to be positive; use negative margins and widths for the axis to render inside of the data frame"
@@ -43,11 +55,11 @@ Direction away from the data frame is defined to be positive; use negative margi
 
     (into [:g.axis {:class (name orientation)}
            [:line.rule (apply hash-map (interleave [y1 y2] (:range scale)))]]
-           (map (fn [d]
-            [:g.major-tick {:transform (translate {x 0 y (scale d)})}
-             [:text {x (* parity text-margin)} (formatter d)]
-             [:line {x1 0 x2 (* parity major-tick-width)}]])
-          ticks))))
+          (map (fn [d]
+                 [:g.major-tick {:transform (translate {x 0 y (scale d)})}
+                  [:text {x (* parity text-margin)} (formatter d)]
+                  [:line {x1 0 x2 (* parity major-tick-width)}]])
+               ticks))))
 
 
 (def ArcMax (- Tau 0.0000001))
