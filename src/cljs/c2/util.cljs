@@ -14,3 +14,8 @@
                                 (assoc m (clj->js k) (clj->js v))) {} x))
    (coll? x) (apply array (map clj->js x))
    :else x))
+
+(defn ->coll
+  "Convert something into a collection, if it's not already."
+  [x]
+  (if (coll? x) x [x]))
