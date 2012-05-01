@@ -18,7 +18,8 @@
 (defn scale [coordinates]
   (match [coordinates]
          [[x y]] (str "scale(" x "," y ")")
-         [{:x x :y y}] (recur [x y])))
+         [{:x x :y y}] (recur [x y])
+         [s] (str "scale(" s ")")))
 
 
 (defn ^:cljs get-bounds
