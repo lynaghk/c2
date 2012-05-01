@@ -6,7 +6,8 @@
 ^:cljs (ns c2.svg
          (:use-macros [clojure.core.match.js :only [match]])
          (:use [c2.maths :only [Pi Tau radians-per-degree
-                                sin cos]]))
+                                sin cos]])
+         (:require [c2.dom :as dom]))
 
 
 ;;Lil' SVG helpers
@@ -25,12 +26,35 @@
 (defn ^:cljs get-bounds
   "Returns map of {:x :y :width :height} containing SVG element bounding box.
    All coordinates are in userspace. See: http://www.w3.org/TR/SVG/types.html#InterfaceSVGLocatable"
-  [$svg]
-  (let [b (.getBBox $svg)]
+  [$svg-el]
+  (let [b (.getBBox $svg-el)]
     {:x (.-x b)
      :y (.-y b)
      :width (.-width b)
      :height (.-height b)}))
+
+(defn transform-to-center
+  "Returns a transform string that will scale and center provided element {:width :height :x :y} within container {:width :height}."
+  [element container]
+  (let [{ew :width eh :height x :x y :y} element
+        {w :width h :height} container
+        s (min (/ h eh) (/ w ew))]
+    (str (translate [(- (/ w 2) (* s (/ ew 2)))
+                     (- (/ h 2) (* s (/ eh 2)))]);;translate scaled to center
+         " " (scale s) ;;scale
+         " " (translate [(- x) (- y)]) ;;translate to origin
+         )))
+
+
+(defn ^:cljs transform-to-center!
+  "Scales and centers $svg-el within its parent SVG container.
+   Uses parent's width and height attributes only."
+  [$svg-el]
+  (let [$svg (.-ownerSVGElement $svg-el)
+        t (transform-to-center (get-bounds $svg-el)
+                               {:width (js/parseFloat (dom/attr $svg :width))
+                                :height (js/parseFloat (dom/attr $svg :height))})]
+    (dom/attr $svg-el :transform t)))
 
 
 
