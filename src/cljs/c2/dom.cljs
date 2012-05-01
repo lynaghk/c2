@@ -71,6 +71,12 @@
 (defn remove! [el]
   (gdom/removeNode (select el)))
 
+(defn replace! [old new]
+  (let [new (if (dom-element? new)
+              new
+              (build-dom-elem new))]
+    (gdom/replaceNode new (select old))))
+
 (defn style
   ([el] (throw (js/Error. "TODO: return map of element styles")))
   ([el x] (match [x]
