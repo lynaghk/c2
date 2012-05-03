@@ -12,3 +12,4 @@ out/
 .generated
 .lein*
 vm/
+docs/

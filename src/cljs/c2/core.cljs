@@ -1,3 +1,4 @@
+;;Core functions that map data to DOM elements.
 (ns c2.core
   (:use-macros [c2.util :only [p pp]])
   (:use [cljs.reader :only [read-string]]
@@ -19,54 +20,59 @@
   IHash
   (-hash [x] x))
 
+
+;;Attach data to live dom elements
 (def node-data-key "c2")
-(defmulti attach-data (fn [node d] (node-type node)))
-(defmethod attach-data :chiccup [node d]
-  (assoc node :data
-         (binding [*print-dup* true] (pr-str d))))
-
-(defmethod attach-data :dom [node d]
-  (set! (.-__c2data__ node) d)
-  node)
-
-(defmulti read-data (fn [node] (node-type node)))
-(defmethod read-data :chiccup [node]
-  (read-string (:data node)))
-(defmethod read-data :dom [node]
-  (let [d (.-__c2data__ node)]
+(defn attach-data [$node d]
+  (set! (.-__c2data__ $node) d)
+  $node)
+(defn read-data [$node d]
+  (let [d (.-__c2data__ $node)]
     (if (undefined? d) nil d)))
 
 
+  
+;; Given:
+;;
+;; > *container* CSS selector or live DOM node  
+;; > *data* seqable or IWatchable that derefs to seqable  
+;; > *mapping* fn of datum which returns Hiccup vector  
+;;
+;; calls (mapping datum) for each datum and appends resulting elements to container.
+;; Automatically updates elements mapped to data according to `key-fn` (defaults to index) and removes elements that don't match.
+;;
+;; Optional kwargs fns (args prefixed with $ are live DOM nodes):
+;;
+;; > *:enter*  `(fn [d idx $node])`  
+;; > *:update* `(fn [d idx $old new])`  
+;; > *:exit*   `(fn [d idx $node])`
+;;
+;; called before DOM changed; return false to prevent default behavior.
+;;
+;; Other optional kwargs:
+;;
+;; > *:selector* CSS selector to scope elements; `unify!` defaults to all container children  
+;; > *:key-fn* fn of datum and index that associates (potentially live) nodes with new data, defaults to index  
+;; > *:defer-attr* update attributes on next animation frame instead of immediately, defaults to `false`  
+;; > *:force-update* update node even if data is identical; useful if mapping fn references mutable state, defaults to `false`
+;;
+;; If data implements IWatchable, DOM will update when data changes.
 (defmulti unify!
-  "Given container, data, and mapping-fn, calls (mapping datum idx) for each datum and appends resulting elements to container.
-Automatically updates elements mapped to data according to key-fn (defaults to index) and removes elements that don't match.
-Scoped to :selector kwarg if given, otherwise applies to all container's children.
-
-Optional kwargs fns (args prefixed with $ are live DOM nodes):
-
-  (enter d idx $node)
-  (update d idx $old new)
-  (exit d idx $node)
-
-called before DOM changed; return false to prevent default behavior.
-
-If data implements IWatchable, DOM will update when data changes."
   (fn [container data mapping & kwargs]
-    (cond (satisfies? cljs.core.IWatchable data) :atom
+    (cond (satisfies? cljs.core.IWatchable data) :watchable
           (satisfies? cljs.core.ISeqable data)   :seq
           :else (do (pp data)
-                    (throw (js/Error. "Unify! requires data to be seqable or an atom containing seqable"))))))
+                    (throw (js/Error. "Unify! requires data to be seqable or IWatchable that derefs to seqable."))))))
 
-(defmethod unify! :atom
+;;Adds watcher to atom and runs unify! whenever the atom is updated.
+(defmethod unify! :watchable
   [container !data & args]
   (let [redraw! #(apply unify! container % args)]
-    ;;add watcher to redraw whenever atom is update
     (add-watch !data (keyword (gensym "auto-unify!-"))
                (fn [_ _ old new] (when (not= old new)
                                   (redraw! new))))
     ;;initial draw
     (redraw! @!data)))
-
 
 (defmethod unify! :seq
   [container data mapping & {:keys [selector key-fn pre-fn post-fn update exit enter

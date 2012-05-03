@@ -1,8 +1,8 @@
-(defproject com.keminglabs/c2 "0.1.0-beta2"
+(defproject com.keminglabs/c2 "0.1.0-beta3-SNAPSHOT"
   :description "Declarative data visualization in Clojure(Script)."
   :url "http://keminglabs.com/c2/"
   :license {:name "BSD" :url "http://www.opensource.org/licenses/BSD-3-Clause"}
-
+  
   :dependencies [[org.clojure/clojure "1.3.0"]
                  [org.clojure/core.match "0.2.0-alpha9"]
                  [clj-iterate "0.96"]]
@@ -15,10 +15,13 @@
                    ;;Required for lazytest.
                    :repositories {"stuartsierra-releases" "http://stuartsierra.com/maven2"
                                   "stuartsierra-snapshots" "http://stuartsierra.com/m2snapshots"}}}
-
+  
+  :min-lein-version "2.0.0"
+  
   :plugins [[com.keminglabs/cljx "0.1.0"]
             [lein-cljsbuild "0.1.6"]
-            [lein-midje "2.0.0-SNAPSHOT"]]
+            [lein-midje "2.0.0-SNAPSHOT"]
+            [lein-marginalia "0.7.0"]]
 
   :source-paths ["src/clj" "src/cljs"
                  ;;See src/cljx/README.markdown
@@ -26,7 +29,7 @@
 
                  ;;Uncomment & change accordingly if you want to build/test with a different version of ClojureScript besides what comes with cljsbuild.
                  ;;For details: https://github.com/emezeske/lein-cljsbuild/issues/58
-                 ;;"../software/clojurescript/src/clj" "../software/clojurescript/src/cljs"                 
+                 ;;"../software/clojurescript/src/clj" "../software/clojurescript/src/cljs"
                  ]
 
   :cljx {:builds [{:source-paths ["src/cljx"]
@@ -37,8 +40,7 @@
                    :output-path ".generated/cljs"
                    :extension "cljs"
                    :rules cljx.rules/cljs-rules}]}
-
-
+  
   :cljsbuild {:builds {:test {:source-path "test/integration/cljs"
                               :compiler {:output-to "out/test/integration.js"
                                          :optimizations :simple
