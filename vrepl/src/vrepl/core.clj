@@ -1,5 +1,4 @@
 (ns vrepl.core
-  (:gen-class)
   (:import org.apache.commons.vfs2.VFS
            org.apache.commons.vfs2.impl.DefaultFileMonitor
            org.apache.commons.vfs2.FileListener)
@@ -7,7 +6,7 @@
   (:use [hiccup.core :only [html]]))
 
 (def opts (atom {}))
-(def current-page (atom [:h1 "Visual REPL ready."]))
+(def current-page (atom [:div]))
 
 (defn output-clj!
   "Output result of freshly reloaded Clojure file"

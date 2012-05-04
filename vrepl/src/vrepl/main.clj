@@ -8,7 +8,7 @@
   (println  "Extracting assets to" path)
   
   (when (not (.exists (java.io.File. path)))
-    (.mkdir (java.io.File. path)))
+    (.mkdirs (java.io.File. path)))
   
   ;;Hardcoded list of sample files in the JAR to extract.
   ;;Pull request if you want to write something more general.
@@ -28,7 +28,7 @@
                                                         ["--compile-all" "Compile all files to HTML" :default false :flag true]
                                                         ["--extract" "Extract built-in samples directory before starting watcher" :default false :flag true]
                                                         ["--path" "Path to watch (recursive)"
-                                                         :default (str (System/getProperty "user.dir") "/" "resources/samples")
+                                                         :default (str (System/getProperty "user.dir") "/" "samples")
                                                          :parse-fn #(str (System/getProperty "user.dir") "/" %)]
                                                         ["--port" "Webserver port" :default 8987 :parse-fn #(Integer. %)])]
 
@@ -42,11 +42,15 @@
       (core/compile-all! path)
       (System/exit 0))
     
-    (when (:extract opts)
-      (extract-assets! path))
+    (if (:extract opts)
+      (extract-assets! path)
+      (println "Run with --extract flag to extract sample files."))
 
     (when (not (.exists (java.io.File. path)))
       (println "Path" (str "\"" path "\"") "not found")
       (System/exit 1))
+
+    (reset! core/current-page [:div [:h1 "Visual REPL ready."]
+                               [:span "Monitoring: " path]])
     
     (monitor-and-start path port)))
