@@ -7,19 +7,25 @@
             [goog.dom.classes :as gclasses]
             [goog.style :as gstyle]))
 
-;; From Weavejester's Hiccup.
-(def ^{:doc "Regular expression that parses a CSS-style id and class from a tag name."}
-  re-tag #"([^\s\.#]+)(?:#([^\s\.#]+))?(?:\.([^\s#]+))?")
+;; Regular expression that parses a CSS-style id and class from a tag name. From Weavejester's Hiccup.
+(def re-tag #"([^\s\.#]+)(?:#([^\s\.#]+))?(?:\.([^\s#]+))?")
 
+;;Namespace URIs
 (def xmlns {:xhtml "http://www.w3.org/1999/xhtml"
             :svg "http://www.w3.org/2000/svg"})
 
+;;Common SVG tags; DOM node creation fn checks this set to infer element namespace (so users don't have to write things like [:svg:rect]).
 (def svg-tags #{:svg :g :rect :circle :clipPath :path :line :polygon :polyline :text :textPath})
 
-(defn dom-element? [x]
+
+(defn dom-element?
+  "Live DOM elements have JavaScript nodeName defined."
+  [x]
   (not (undefined? (.-nodeName x))))
 
-(defn node-type [node]
+(defn node-type
+  "Check node type; used as a dispatch fn."
+  [node]
   (cond
    (vector? node)      :hiccup   ;;Hiccup vector
    (map? node)         :chiccup  ;;Hiccup map representation
@@ -27,25 +33,33 @@
    (dom-element? node) :dom      ;;It's an actual DOM node
    ))
 
-(defmulti select node-type)
+(defmulti select
+  "Select a single DOM node via CSS selector, optionally scoped by second arg.
+   If passed live DOM node, just return it."
+  node-type)
 (defmethod select :selector
   ([selector] (.querySelector js/document selector))
   ([selector container] (.querySelector (select container) selector)))
 (defmethod select :dom [node] node)
 
-(defmulti select-all node-type)
+(defmulti select-all
+  "Like select, but returns a collection of nodes."
+  node-type)
 (defmethod select-all :selector
   ([selector] (.querySelectorAll js/document selector))
   ([selector container] (.querySelectorAll (select container) selector)))
 (defmethod select-all :dom [nodes] nodes)
 
 
-
-(defn children [node]
+(defn children
+  "Return the children of a live DOM element."
+  [node]
   (filter #(= 1 (.-nodeType %))
           (.-childNodes (select node))))
 
-(defn parent [node]
+(defn parent
+  "Return parent of a live DOM node."
+  [node]
   (.-parentNode (select node)))
 
 
@@ -54,43 +68,81 @@
 (declare canonicalize)
 
 
-(defn append! [container el]
+(defn append!
+  "Make element last child of container.
+   Returns live DOM node.
+   > *container* CSS selector or live DOM node
+   > *el* hiccup vector"
+  [container el]
   (let [el (if (dom-element? el)
              el
              (build-dom-elem el))]
     (gdom/appendChild (select container) el)
     el))
 
-(defn prepend! [container el]
+(defn prepend!
+  "Make element first child of container.
+   Returns live DOM node.
+   > *container* CSS selector or live DOM node
+   > *el* hiccup vector"
+  [container el]
   (let [el (if (dom-element? el)
              el
              (build-dom-elem el))]
     (gdom/insertChildAt (select container) el 0)
     el))
 
-(defn remove! [el]
+(defn remove!
+  "Remove element from DOM and return it.
+   > *el* CSS selector or live DOM node"
+  [el]
   (gdom/removeNode (select el)))
 
-(defn replace! [old new]
-  (let [new (if (dom-element? new)
-              new
-              (build-dom-elem new))]
+(defn replace!
+  "Replace live DOM node with a new one.
+   > *old* CSS selector or live DOM node
+   > *new* CSS selector, live DOM node, or hiccup vector"
+  [old new]
+  (let [new (condp = (node-type new)
+              :dom new
+              :hiccup (build-dom-elem new)
+              :selector (select new))]
     (gdom/replaceNode new (select old))))
 
 (defn style
+  "Get or set inline element style.
+
+   `(style el)`                map of inline element styles
+
+   `(style el :keyword)`       value of style :keyword
+
+   `(style el {:keyword val})` sets inline style according to map, returns element
+
+   `(style el :keyword val)`   sets single style, returns element"
   ([el] (throw (js/Error. "TODO: return map of element styles")))
   ([el x] (match [x]
                  [(k :when keyword?)] (gstyle/getComputedStyle el (name k))
-                 [(m :when map?)] (doseq [[k v] m] (style el k v))))
+                 [(m :when map?)] (doseq [[k v] m] (style el k v)))
+     el)
   ([el k v] (gstyle/setStyle el (name k)
                              (match [v]
                                     [s :when string?] s
                                     [n :when number?]
                                     (if (#{:height :width :top :left :bottom :right} (keyword k))
                                       (str n "px")
-                                      n)))))
+                                      n)))
+     el))
 
 (defn attr
+  "Get or set element attributes.
+
+   `(attr el)`                map of element attributes
+
+   `(attr el :keyword)`       value of attr :keyword
+
+   `(attr el {:keyword val})` sets element attributes according to map, returns element
+
+   `(attr el :keyword val)`   sets single attr, returns element"
   ([el] (let [attrs (.-attributes el)]
           (into {} (for [i (range (.-length attrs))]
                      [(keyword  (.-name (aget attrs i)))
@@ -103,11 +155,15 @@
        (style el v)
        (.setAttribute el (name k) v))))
 
-(defn text [el v]
-  (gdom/setTextContent el v))
+(defn text
+  "Get or set element text."
+  ([el]
+     (gdom/getTextContent (select el)))
+  ([el v]
+     (gdom/setTextContent (select el) v)))
 
 (defn classed!
-  "Adds or removes `class` to `el` based on boolean `classed?`."
+  "Add or remove `class` to `el` based on boolean `classed?`."
   [el class classed?]
   (gclasses/enable (select el) class classed?))
 
@@ -115,33 +171,38 @@
 (defn add-class! [el class] (classed! el class true))
 (defn remove-class! [el class] (classed! el class false))
 
+
+;;Call this fn with a fn that should be executed on the next browser animation frame.
 (def request-animation-frame
   (or (.-requestAnimationFrame js/window)
       (.-webkitRequestAnimationFrame js/window)
       #(timeout 10 (%))))
 
 (defn merge-dom!
-  "Walks an existing dom-node and makes sure that it has the same attributes and children as the given el."
-  [dom-node el & {:keys [defer-attr]
-                  :or {defer-attr false}}]
+  "Recursively walk a live DOM node, unifying its attributes and children with those of hiccup vector `el`.
+   Boolean kwarg `:defer-attr` to set attributes on next animation frame, defaults to `false`. "
+  [$node el & {:keys [defer-attr]
+               :or {defer-attr false}}]
   (let [el (canonicalize el)]
-    (when (not= (.toLowerCase (.-nodeName dom-node))
+    (when (not= (.toLowerCase (.-nodeName $node))
                 (.toLowerCase (name (:tag el))))
       (throw "Cannot merge el into node of a different type"))
-    
+
     (if defer-attr
-      (request-animation-frame #(attr dom-node (:attr el)) dom-node)
-      (attr dom-node (:attr el)))
+      (request-animation-frame #(attr $node (:attr el)) $node)
+      (attr $node (:attr el)))
 
     (when-let [txt (first (filter string? (:children el)))]
-      (text dom-node txt))
-    (iter {for [dom-child el-child] in (map vector (children dom-node)
+      (text $node txt))
+    (iter {for [dom-child el-child] in (map vector (children $node)
                                             (remove string? (:children el)))}
           (merge-dom! dom-child el-child :defer-attr defer-attr))
-    dom-node))
+    $node))
 
 (defn canonicalize
-  "Parse hiccup-like vec into map of {:tag :attr :children}, or return string as itself.
+  "Convert hiccup vectors into maps suitable for rendering.
+   Hiccup vectors will be converted to maps of {:tag :attr :children}.
+   Strings will be passed through and numbers coerced to strings.
    Based on Pinot's html/normalize-element."
   [x]
   (match [x]
@@ -164,10 +225,10 @@
                                                                   {:id (or id nil)
                                                                    :class (if class (string/replace class #"\." " "))}))
                                    map-attrs        (first content)]
-                               
+
                                (let [[attr raw-children] (if (map? map-attrs)
-                                                                [(merge tag-attrs map-attrs) (next content)]
-                                                                [tag-attrs content])
+                                                           [(merge tag-attrs map-attrs) (next content)]
+                                                           [tag-attrs content])
                                      ;;Explode children seqs in place
                                      children (mapcat #(if (and (not (vector? %)) (seq? %))
                                                          (map canonicalize %)
@@ -178,7 +239,9 @@
 (defn create-elem [nsp tag]
   (.createElementNS js/document nsp (name tag)))
 
-(defn build-dom-elem [el]
+(defn build-dom-elem
+  "Build live DOM element from hiccup vector, hiccup map, or string."
+  [el]
   (match [el]
          [(s :when string?)] (gdom/createTextNode s)
          [(v :when vector?)] (recur (canonicalize v))
