@@ -9,6 +9,10 @@ Declarative behavior?
   http://jbeard4.github.com/SCION/
 
 
+Constraint-based layout
+  http://github.com/lynaghk/cassowary-coffee
+
+
 Is it possible to use pre/post conditions in development, but then strip them out when compiling to JS to save space?
 
 ticks#search should take optional kwarg to find ticks that are a proper subset or superset of the data range
@@ -22,8 +26,3 @@ Pretty stack traces
 
 
 
-Design decisions
-================
-
-Should thing like svg.arc be higher order functions (as in D3), or just work as basic utilities?
-The latter is simpler, and I'm not convinced of the advantages of defining things like arc helpers away from where they'll be used.
