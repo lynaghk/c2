@@ -2,14 +2,14 @@
   (:use [c2.maths :only [add div]]))
 
 (defn close-coordinates
-  "Make sure a list of polygon coordinates is closed by adding the first coordinate to the end"
+  "Closes a collection of coordinates by adding the first coordinate to the end"
   [coordinates]
   (concat coordinates
           [(first coordinates)]))
 
 (defn area
-  "Calculate area from list of counterclockwise coordinates.
-   http://en.wikipedia.org/wiki/Polygon#Area_and_centroid"
+  "Calculate area from list of counterclockwise coordinates,
+   ref [Wikipedia](http://en.wikipedia.org/wiki/Polygon#Area_and_centroid)"
   [coordinates]
   (* 0.5 (apply + (map (fn [[[x0 y0] [x1 y1]]]
                          (- (* y0 x1)
@@ -17,8 +17,8 @@
                        (partition 2 1 (close-coordinates coordinates))))))
 
 (defn centroid
-  "Calculate centroid from list of counterclockwise coordinates.
-   http://en.wikipedia.org/wiki/Polygon#Area_and_centroid"
+  "Calculate centroid from list of counterclockwise coordinates,
+   ref [Wikipedia](http://en.wikipedia.org/wiki/Polygon#Area_and_centroid)"
   [coordinates]
   (div (apply add (map (fn [[[x0 y0] [x1 y1]]]
                               (let [cross (- (* y0 x1) (* x0 y1))]
