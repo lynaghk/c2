@@ -8,7 +8,7 @@
          (:use [c2.maths :only [radians-per-degree
                                 sin cos sqrt]]))
 
-;;"The Albers equal-area conic projection. See http://mathworld.wolfram.com/AlbersEqual-AreaConicProjection.html"
+;;The [Albers](http://mathworld.wolfram.com/AlbersEqual-AreaConicProjection.html) equal-area conic projection
 (c2-obj albers
         {:origin [-98 38]
          :parallels [29.5, 45.5]
@@ -37,7 +37,7 @@
                       (second translate))])))
 
 
-;;"Albers projection with Alaska, Hawaii, and Puerto Rico scaled/translated to fit nicely with each other"
+;;Albers projection with Alaska, Hawaii, and Puerto Rico scaled and translated to fit nicely with each other
 (c2-obj albers-usa
         {:origin [-98 38]
          :parallels [29.5, 45.5]

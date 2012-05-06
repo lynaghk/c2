@@ -10,8 +10,13 @@
          (:require [c2.geom.polygon :as c2.geom.polygon]))
 
 
-(defn area [geo & {:keys [projection]
-                   :or {projection identity}}]
+(defn area
+  "Calculate the area of a geoJSON feature.
+
+   Kwargs:
+   > *:projection* fn applied to each coordinate, defaults to identity. If your input coordinates are lat/lon, you probably want this to be `(albers :scale radius-of-earth)` since albers is an area-preserving projection."
+  [geo & {:keys [projection]
+          :or {projection identity}}]
 
   (let [polygon-area (fn [poly-coordinates]
                        (let [area (fn [coordinates]
@@ -33,7 +38,12 @@
                 (apply + (map polygon-area xs))))))
 
 
-(defn centroid [geo & {:keys [projection]
+(defn centroid
+  "Calculate the centroid coordinates of a geoJSON feature.
+
+   Kwargs:
+   > *:projection* fn applied to each coordinate, defaults to identity."
+  [geo & {:keys [projection]
                        :or {projection identity}}]
 
   (let [polygon-centroid (fn [poly-coordinates]

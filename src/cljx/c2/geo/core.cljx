@@ -7,8 +7,8 @@
          (:use-macros [clojure.core.match.js :only [match]]))
 
 
-^:cljs (do ;;use JS native map and join fns---this is about 3 times faster than using CLJS.
-
+;;Use JS native map and join fns; this is about 3 times faster than using CLJS seqs and str.
+^:cljs (do
          ;;taken from ClojureScript master; remove once a new release is cut.
          (defn into-array
            ([aseq]
@@ -29,7 +29,10 @@
 
 
 (defn geo->svg
-  "Convert geoJSON to svg path data. Takes optional projection, defaulting to identity"
+  "Convert geoJSON to SVG path data.
+
+   Kwargs:
+   > *:projection* fn applied to each coordinate, defaults to identity"
   [geo & {:keys [projection]
           :or {projection identity}}]
 
