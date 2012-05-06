@@ -1,3 +1,6 @@
+;;Collection of helpers for dealing with scalable vector graphics.
+;;
+;;Coordinates to any fn can be 2-vector `[x y]` or map `{:x x :y y}`.
 ^:clj (ns c2.svg
         (:use [c2.maths :only [Pi Tau radians-per-degree
                                sin cos]]
@@ -10,11 +13,16 @@
          (:require [c2.dom :as dom]))
 
 
-;;Lil' SVG helpers
-(defn translate [coordinates]
+(defn ->xy
+  "Convert coordinates (potentially map of `{:x :y}`) to 2-vector."
+  [coordinates]
   (match [coordinates]
-         [[x y]] (str "translate(" x "," y ")")
-         [{:x x :y y}] (recur [x y])))
+         [[x y]] [x y]
+         [{:x x :y y}] [x y]))
+
+(defn translate [coordinates]
+  (let [[x y]] (->xy coordinates)
+       (str "translate(" x "," y ")")))
 
 (defn scale [coordinates]
   (match [coordinates]
@@ -24,8 +32,8 @@
 
 
 (defn ^:cljs get-bounds
-  "Returns map of {:x :y :width :height} containing SVG element bounding box.
-   All coordinates are in userspace. See: http://www.w3.org/TR/SVG/types.html#InterfaceSVGLocatable"
+  "Returns map of `{:x :y :width :height}` containing SVG element bounding box.
+   All coordinates are in userspace. Ref [SVG spec](http://www.w3.org/TR/SVG/types.html#InterfaceSVGLocatable)"
   [$svg-el]
   (let [b (.getBBox $svg-el)]
     {:x (.-x b)
@@ -34,7 +42,7 @@
      :height (.-height b)}))
 
 (defn transform-to-center
-  "Returns a transform string that will scale and center provided element {:width :height :x :y} within container {:width :height}."
+  "Returns a transform string that will scale and center provided element `{:width :height :x :y}` within container `{:width :height}`."
   [element container]
   (let [{ew :width eh :height x :x y :y} element
         {w :width h :height} container
@@ -47,7 +55,7 @@
 
 
 (defn ^:cljs transform-to-center!
-  "Scales and centers $svg-el within its parent SVG container.
+  "Scales and centers `$svg-el` within its parent SVG container.
    Uses parent's width and height attributes only."
   [$svg-el]
   (let [$svg (.-ownerSVGElement $svg-el)
@@ -59,8 +67,18 @@
 
 
 (defn axis
-  "Returns axis <g> for input scale with ticks.
-Direction away from the data frame is defined to be positive; use negative margins and widths for the axis to render inside of the data frame"
+  "Returns axis <g> hiccup vector for provided input `scale` and collection of `ticks` (numbers).
+   Direction away from the data frame is defined to be positive; use negative margins and widths to render axis inside of data frame.
+
+   Kwargs:
+
+   > *:orientation* &in; (`:top`, `:bottom`, `:left`, `:right`), where the axis should be relative to the data frame, defaults to `:left`
+
+   > *:formatter* fn run on tick values, defaults to `str`
+
+   > *:major-tick-width* width of ticks (minor ticks not yet implemented), defaults to 6
+
+   > *:text-margin* distance between axis and start of text, defaults to 9"
   [scale ticks & {:keys [orientation
                          formatter
                          major-tick-width
@@ -90,14 +108,16 @@ Direction away from the data frame is defined to be positive; use negative margi
 (def ArcMax (- Tau 0.0000001))
 
 (defn circle
-  "Returns svg path data for a circle starting at 3 o'clock and sweeping in positive y."
+  "Calculate SVG path data for a circle of `radius` starting at 3 o'clock and sweeping in positive y."
   ([radius] (circle [0 0] radius))
-  ([[x y] radius]
-     (str "M"  (+ x radius) "," y
-          "A" (+ x radius) "," (+ y radius) " 0 1,1" (- (+ x radius)) "," y
-          "A" (+ x radius) "," (+ y radius) " 0 1,1" (+ x radius) "," y)))
+  ([coordinates radius]
+     (let [[x y] (->xy coordinates)]
+       (str "M"  (+ x radius) "," y
+            "A" (+ x radius) "," (+ y radius) " 0 1,1" (- (+ x radius)) "," y
+            "A" (+ x radius) "," (+ y radius) " 0 1,1" (+ x radius) "," y))))
 
 (defn arc
+  "Calculate SVG path data for an arc."
   [& {:keys [inner-radius, outer-radius
              start-angle, end-angle, angle-offset]
       :or {inner-radius 0, outer-radius 1
