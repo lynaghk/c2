@@ -41,7 +41,7 @@
 ;; calls (mapping datum) for each datum and appends resulting elements to container.
 ;; Automatically updates elements mapped to data according to `key-fn` (defaults to index) and removes elements that don't match.
 ;;
-;; Optional kwargs fns (args prefixed with $ are live DOM nodes):
+;; Kwargs fns (args prefixed with $ are live DOM nodes):
 ;;
 ;; > *:enter*  `(fn [d idx $node])`  
 ;; > *:update* `(fn [d idx $old new])`  
@@ -49,7 +49,7 @@
 ;;
 ;; called before DOM changed; return false to prevent default behavior.
 ;;
-;; Other optional kwargs:
+;; Other kwargs:
 ;;
 ;; > *:selector* CSS selector to scope elements; `unify!` defaults to all container children  
 ;; > *:key-fn* fn of datum and index that associates (potentially live) nodes with new data, defaults to index  

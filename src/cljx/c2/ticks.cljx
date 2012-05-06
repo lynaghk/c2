@@ -77,7 +77,7 @@
    Returns a map with `{:min :max :step :extent :ticks}` of optimal labeling (if one is found).
    Returns an empty map if no labelings can be found.
 
-   Optional kwargs:
+   Kwargs:
 
    > *:target-density* labels per length, defaults to 0.01 (one label per 100 units)
 
