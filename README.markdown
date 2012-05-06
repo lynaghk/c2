@@ -11,7 +11,12 @@
 
 C2 is a [D3](http://mbostock.github.com/d3)-inspired data visualization library for Clojure and ClojureScript.
 Map data directly to DOM-elements on the client-side or Hiccup vectors on the server-side and leverage the existing power of HTML, SVG, CSS, and the web ecosystem to construct bespoke data visualizations.
-For examples, see the [official site](http://keminglabs.com/c2/).
+
+See:
+
+[Example gallery](http://keminglabs.com/c2/)
+
+[Annotated source](http://keminglabs.com/c2/docs/)
 
 
 EVERYTHING IS ALPHA
@@ -19,7 +24,6 @@ EVERYTHING IS ALPHA
 ClojureScript is new.
 This library is newer.
 We have no idea what's going on, and we're going to break a lot of stuff figuring it out.
-
 
 
 Play around
@@ -32,8 +36,8 @@ To use from Clojure/ClojureScript add this to your `project.clj`:
 
     [com.keminglabs/c2 "0.1.0-beta2"]
 
-Because the complex classpath setup, Leiningen 2.0.0 is required.
-For ClojureScript development, I highly recommend using [lein-cljsbuild](https://github.com/emezeske/lein-cljsbuild).
+Because of the complex classpath setup, Leiningen 2.0.0 is required.
+For ClojureScript development, check out [lein-cljsbuild](https://github.com/emezeske/lein-cljsbuild).
 
 
 Differences from D3
@@ -75,25 +79,21 @@ If you want to circumvent it and manipulate nodes manually, you can provide cust
 
 
 
-Roadmap
-=======
 
-+ Moar documentation, consistent docstring format.
+Development
+===========
+Most of C2 is written in platform-agnostic Clojure using [cljx](http://github.com/lynaghk/cljx), a Clojure/ClojureScript code generator.
+If you edit a `.cljx` file, run
 
-+ Official release
+    lein cljx
 
+to regenerate the corresponding `.clj` and `.cljs` files.
 
-Testing
-=======
+Unit tests are written in [Midje](https://github.com/marick/Midje); run with:
 
-Most of C2 is written in platform-agnostic Clojure and tested with Midje.
-Run
+    lein midje
 
-    lein midje --autotest
-
-to start a test watcher, which will automatically reload namespaces and run tests when source or test files are changed.   
-
-For ClojureScript-specific integration testing, you can run our highly advanced, PhantomJS-powered "list-of-assertions" testing framework:
+For ClojureScript-specific integration testing, you can run the highly advanced, PhantomJS-powered "list-of-assertions" testing framework:
 
     lein cljsbuild test
 
