@@ -1,8 +1,8 @@
 ^:clj (ns c2.maths
-        (:use [c2.macros :only [combine-with]]))
+        (:use [c2.util :only [combine-with]]))
 
 ^:cljs (ns c2.maths
-         (:use-macros [c2.macros :only [combine-with]]))
+         (:use-util [c2.macros :only [combine-with]]))
 
 
 (def Pi 3.141592653589793)
