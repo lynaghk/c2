@@ -10,39 +10,30 @@
 (def radians-per-degree (/ Pi 180))
 
 
-(defn ^:clj sin [x] (Math/sin x))
-(defn ^:cljs sin [x] (.sin js/Math x))
+(defn sin [x] (Math/sin x))
+(defn cos [x] (Math/cos x))
+(defn tan [x] (Math/tan x))
 
-(defn ^:clj cos [x] (Math/cos x))
-(defn ^:cljs cos [x] (.cos js/Math x))
-
-(defn ^:clj expt
+(defn expt
   ([x] (Math/exp x))
   ([x y] (Math/pow x y)))
-(defn ^:cljs expt
-  ([x] (.exp js/Math x))
-  ([x y] (.pow js/Math x y)))
-
-(defn ^:clj sqrt [x] (Math/sqrt x))
-(defn ^:cljs sqrt [x] (.sqrt js/Math x))
 
 (defn sq [x] (expt x 2))
+(defn sqrt [x] (Math/sqrt x))
 
-(defn ^:clj abs [x] (Math/abs x))
-(defn ^:cljs abs [x] (.abs js/Math x))
+(defn floor [x] (Math/floor x))
+(defn ceil [x] (Math/ceil x))
+(defn abs [x] (Math/abs x))
 
-(defn ^:clj log [x] (Math/log x))
-(defn ^:cljs log [x] (.log js/Math x))
+(defn log
+  ([x] (Math/log x))
+  ([base x] (/ (Math/log x)
+               (Math/log base))))
 
 (defn ^:clj log10 [x] (Math/log10 x))
 (defn ^:cljs log10 [x] (/ (.log js/Math x)
                           (.-LN10 js/Math)))
 
-(defn ^:clj floor [x] (Math/floor x))
-(defn ^:cljs floor [x] (.floor js/Math x))
-
-(defn ^:clj ceil [x] (Math/ceil x))
-(defn ^:cljs ceil [x] (.ceil js/Math x))
 
 (defn extent
   "Returns 2-vector of min and max elements in xs."
