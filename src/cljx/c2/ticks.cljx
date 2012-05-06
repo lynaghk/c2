@@ -1,3 +1,6 @@
+;;Implementation of [An Extension of Wilkinson’s Algorithm for Positioning Tick Labels on Axes](http://graphics.stanford.edu/vis/publications/2010/labeling-preprint.pdf) by Justin Talbot, Sharon Lin, and Pat Hanrahan.
+;;See also [Talbot's website](http://www.justintalbot.com/research/axis-labeling/).
+
 ^:clj (ns c2.ticks
         (:use [c2.maths :only [sq ceil floor log10 expt]]
               [iterate :only [iter]]))
@@ -5,13 +8,6 @@
 ^:cljs (ns c2.ticks
          (:use-macros [iterate :only [iter]])
          (:use [c2.maths :only [sq ceil floor log10 expt]]))
-
-;;Implementation of "An Extension of Wilkinson’s Algorithm for Positioning Tick Labels on Axes" by Justin Talbot, Sharon Lin, and Pat Hanrahan:
-;;
-;;    http://graphics.stanford.edu/vis/publications/2010/labeling-preprint.pdf
-;;
-;;see also: http://www.justintalbot.com/research/axis-labeling/
-
 
 (def Q "Preference-ordered list of nice step sizes"
   [1 5 2 2.5 4 3])
@@ -25,7 +21,7 @@
   (and (> l-max 0) (< l-min 0) (zero? (mod l-min l-step))))
 
 (defn simplicity
-  "Objective function modeling niceness of step sizes and whether a range includes zero."
+  "Objective function modeling niceness of step sizes and whether a range includes zero"
   [q j label-range-contains-zero]
   (let [v (if label-range-contains-zero 1 0)]
     (if (<= (count Q) 1)
@@ -53,7 +49,7 @@
 
 
 (defn density
-  "Objective function for a candidate density r and desired density rt (e.g. labels-per-cm)"
+  "Objective function for a candidate density `r` and desired density `rt` (e.g. labels-per-cm)"
   [r rt]
   ;;Note the formula should be 2-, not 1- as in the paper.
   (- 2 (max (/ r rt) (/ rt r))))
@@ -77,20 +73,24 @@
 
 
 (defn search
-  "Find best ticks for the data range (d-min, d-max) and target label density.
-Returns a map with {:min :max :step :extent :ticks} of optimal labeling, if one is found.
-Returns an empty map if no labelings can be found.
+  "Find best ticks for the data range `[d-min, d-max]`.
+   Returns a map with `{:min :max :step :extent :ticks}` of optimal labeling (if one is found).
+   Returns an empty map if no labelings can be found.
 
-target-density: labels per length; defaults to 0.01---one label per 100 units
-length: available label spacing
-"
+   Optional kwargs:
+
+   > *:target-density* labels per length, defaults to 0.01 (one label per 100 units)
+
+   > *:length* available label spacing
+
+  Since there are no test input/output datasets for the labeling algorithm, I played it safe and copied the imperative algorithm from the paper.
+  If you rewrite it in an understandable and performant functional style, I'll accept a pull request and buy you a bottle of whiskey."
   [[d-min d-max] & {:keys [target-density
                            length]
                     :or {target-density 0.01 ;;Default to one label per 100 px
                          length         500}}]
 
-  ;;To be on the safe side, I've copied the imperative algorithm from the paper.
-  ;;If you rewrite it in an understandable and performant functional style, we'll accept a pull request and buy you a bottle of whiskey.
+
   (let [best-score (atom -2)
         label (atom {})]
 
@@ -124,10 +124,10 @@ length: available label spacing
                                     {for d = (density (/ k length) target-density)}
                                     {for score = (w [s c d 1])}
                                     {return-if (< score @best-score)}
-                                    
+
                                     ;;(println "inner loop")
                                     ;;todo, optimize legibility
-                                    
+
                                     (reset! best-score score)
                                     (reset! label {:min l-min
                                                    :max l-max

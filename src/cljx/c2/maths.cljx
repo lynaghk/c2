@@ -45,13 +45,13 @@
 (defn ^:cljs ceil [x] (.ceil js/Math x))
 
 (defn extent
-  "Returns 2-vector of min and max elements in xs"
+  "Returns 2-vector of min and max elements in xs."
   [xs]
   [(apply min xs)
    (apply max xs)])
 
 (defn irange
-  "Same as core/range, but includes the end."
+  "Inclusive range; same as core/range, but includes the end."
   ([start] (range start))
   ([start end] (concat (range start end) [end]))
   ([start end step] (concat (range start end step) [end])))
