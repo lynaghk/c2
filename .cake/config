@@ -1,3 +1,0 @@
-project.classpath = src/cljs\
-:src/clj\
-:test/integration/
