@@ -183,7 +183,7 @@
       (.-webkitRequestAnimationFrame js/window)
       #(timeout 10 (%))))
 
-(defn merge-dom!
+(defn merge!
   "Recursively walk a live DOM node, unifying its attributes and children with those of hiccup vector `el`.
    Boolean kwarg `:defer-attr` to set attributes on next animation frame, defaults to `false`. "
   [$node el & {:keys [defer-attr]
@@ -201,7 +201,7 @@
       (text $node txt))
     (iter {for [dom-child el-child] in (map vector (children $node)
                                             (remove string? (:children el)))}
-          (merge-dom! dom-child el-child :defer-attr defer-attr))
+          (merge! dom-child el-child :defer-attr defer-attr))
     $node))
 
 (defn canonicalize

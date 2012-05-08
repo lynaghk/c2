@@ -2,7 +2,7 @@
 (ns c2.core
   (:use-macros [c2.util :only [p pp]])
   (:use [cljs.reader :only [read-string]]
-        [c2.dom :only [select select-all node-type append! remove! children build-dom-elem merge-dom! request-animation-frame]])
+        [c2.dom :only [select select-all node-type append! remove! children build-dom-elem merge! request-animation-frame]])
   (:require [goog.dom :as gdom]
             [clojure.set :as set]
             [clojure.string :as string]))
@@ -31,29 +31,36 @@
     (if (undefined? d) nil d)))
 
 
-  
+
 ;; Given:
 ;;
-;; > *container* CSS selector or live DOM node  
-;; > *data* seqable or IWatchable that derefs to seqable  
-;; > *mapping* fn of datum which returns Hiccup vector  
+;; > *container* CSS selector or live DOM node
+;;
+;; > *data* seqable or IWatchable that derefs to seqable
+;;
+;; > *mapping* fn of datum which returns Hiccup vector
 ;;
 ;; calls (mapping datum) for each datum and appends resulting elements to container.
 ;; Automatically updates elements mapped to data according to `key-fn` (defaults to index) and removes elements that don't match.
 ;;
 ;; Kwargs fns (args prefixed with $ are live DOM nodes):
 ;;
-;; > *:enter*  `(fn [d idx $node])`  
-;; > *:update* `(fn [d idx $old new])`  
+;; > *:enter*  `(fn [d idx $node])`
+;;
+;; > *:update* `(fn [d idx $old new])`
+;;
 ;; > *:exit*   `(fn [d idx $node])`
 ;;
 ;; called before DOM changed; return false to prevent default behavior.
 ;;
 ;; Other kwargs:
 ;;
-;; > *:selector* CSS selector to scope elements; `unify!` defaults to all container children  
-;; > *:key-fn* fn of datum and index that associates (potentially live) nodes with new data, defaults to index  
-;; > *:defer-attr* update attributes on next animation frame instead of immediately, defaults to `false`  
+;; > *:selector* CSS selector to scope elements; `unify!` defaults to all container children
+;;
+;; > *:key-fn* fn of datum and index that associates (potentially live) nodes with new data, defaults to index
+;;
+;; > *:defer-attr* update attributes on next animation frame instead of immediately, defaults to `false`
+;;
 ;; > *:force-update* update node even if data is identical; useful if mapping fn references mutable state, defaults to `false`
 ;;
 ;; If data implements IWatchable, DOM will update when data changes.
@@ -70,7 +77,7 @@
   (let [redraw! #(apply unify! container % args)]
     (add-watch !data (keyword (gensym "auto-unify!-"))
                (fn [_ _ old new] (when (not= old new)
-                                  (redraw! new))))
+                                   (redraw! new))))
     ;;initial draw
     (redraw! @!data)))
 
@@ -112,8 +119,8 @@
                            force-update)
                        (or (nil? update)
                            (update d idx (:node old) new-node)))
-              (attach-data (merge-dom! (:node old) new-node
-                                       :defer-attr defer-attr)
+              (attach-data (merge! (:node old) new-node
+                                   :defer-attr defer-attr)
                            d)))
 
           (let [$new-node (-> new-node
