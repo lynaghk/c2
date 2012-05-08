@@ -21,7 +21,7 @@
          [{:x x :y y}] [x y]))
 
 (defn translate [coordinates]
-  (let [[x y]] (->xy coordinates)
+  (let [[x y] (->xy coordinates)]
        (str "translate(" x "," y ")")))
 
 (defn scale [coordinates]
