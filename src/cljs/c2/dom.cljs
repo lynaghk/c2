@@ -122,8 +122,10 @@
   ([el] (throw (js/Error. "TODO: return map of element styles")))
   ([el x] (match [x]
                  [(k :when keyword?)] (gstyle/getComputedStyle el (name k))
-                 [(m :when map?)] (doseq [[k v] m] (style el k v)))
-     el)
+                 [(m :when map?)]
+                 (do
+                   (doseq [[k v] m] (style el k v))
+                   el)))
   ([el k v] (gstyle/setStyle el (name k)
                              (match [v]
                                     [s :when string?] s
@@ -149,11 +151,14 @@
                       (.-value (aget attrs i))]))))
   ([el x] (match [x]
                  [(k :when keyword?)] (.getAttribute el (name k))
-                 [(m :when map?)] (doseq [[k v] m] (attr el k v))))
+                 [(m :when map?)]
+                 (do (doseq [[k v] m] (attr el k v))
+                     el)))
   ([el k v]
      (if (= :style k)
        (style el v)
-       (.setAttribute el (name k) v))))
+       (.setAttribute el (name k) v))
+     el))
 
 (defn text
   "Get or set element text."
