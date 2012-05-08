@@ -2,7 +2,7 @@
         (:use [c2.util :only [combine-with]]))
 
 ^:cljs (ns c2.maths
-         (:use-util [c2.macros :only [combine-with]]))
+         (:use-macros [c2.util :only [combine-with]]))
 
 
 (def Pi 3.141592653589793)
