@@ -41,6 +41,12 @@
   [(apply min xs)
    (apply max xs)])
 
+(defn mean
+  "Arithemetic mean of collection"
+  [xs]
+  (/ (reduce + xs)
+     (count xs)))
+
 (defn irange
   "Inclusive range; same as core/range, but includes the end."
   ([start] (range start))
