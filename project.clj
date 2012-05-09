@@ -1,4 +1,4 @@
-(defproject com.keminglabs/c2 "0.1.0-RC3-SNAPSHOT"
+(defproject com.keminglabs/c2 "0.1.0-RC3"
   :description "Declarative data visualization in Clojure(Script)."
   :url "http://keminglabs.com/c2/"
   :license {:name "BSD" :url "http://www.opensource.org/licenses/BSD-3-Clause"}
@@ -30,6 +30,9 @@
                  ;;Uncomment & change accordingly if you want to build/test with a different version of ClojureScript besides what comes with cljsbuild.
                  ;;For details: https://github.com/emezeske/lein-cljsbuild/issues/58
                  ;;"../software/clojurescript/src/clj" "../software/clojurescript/src/cljs"
+
+                 ;;Use a marginalia fork that documents .cljx files
+                 ;;"../software/marginalia/src"
                  ]
 
   :cljx {:builds [{:source-paths ["src/cljx"]
