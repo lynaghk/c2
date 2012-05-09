@@ -96,10 +96,10 @@
                       [(:or :left :top)] -1
                       [(:or :right :bottom)] 1)]
 
-    (into [:g.axis {:class (name orientation)}
+    (into [:g {:class (str "axis " (name orientation))}
            [:line.rule (apply hash-map (interleave [y1 y2] (:range scale)))]]
           (map (fn [d]
-                 [:g.major-tick {:transform (translate {x 0 y (scale d)})}
+                 [:g.tick.major-tick {:transform (translate {x 0 y (scale d)})}
                   [:text {x (* parity text-margin)} (formatter d)]
                   [:line {x1 0 x2 (* parity major-tick-width)}]])
                ticks))))
