@@ -3,13 +3,13 @@
 ;;Coordinates to any fn can be 2-vector `[x y]` or map `{:x x :y y}`.
 ^:clj (ns c2.svg
         (:use [c2.maths :only [Pi Tau radians-per-degree
-                               sin cos]]
+                               sin cos mean]]
               [clojure.core.match :only [match]]))
 
 ^:cljs (ns c2.svg
          (:use-macros [clojure.core.match.js :only [match]])
          (:use [c2.maths :only [Pi Tau radians-per-degree
-                                sin cos]])
+                                sin cos mean]])
          (:require [c2.dom :as dom]))
 
 
@@ -22,7 +22,7 @@
 
 (defn translate [coordinates]
   (let [[x y] (->xy coordinates)]
-       (str "translate(" x "," y ")")))
+    (str "translate(" x "," y ")")))
 
 (defn scale [coordinates]
   (match [coordinates]
@@ -84,15 +84,22 @@
 
    > *:major-tick-width* width of ticks (minor ticks not yet implemented), defaults to 6
 
-   > *:text-margin* distance between axis and start of text, defaults to 9"
+   > *:text-margin* distance between axis and start of text, defaults to 9
+
+   > *:label* axis label, centered on axis; :left and :right orientation labels are rotated by +/- pi/2, respectively
+
+   > *:label-margin* distance between axis and label, defaults to 28"
   [scale ticks & {:keys [orientation
                          formatter
                          major-tick-width
-                         text-margin]
+                         text-margin
+                         label
+                         label-margin]
                   :or {orientation :left
                        formatter str
                        major-tick-width 6
-                       text-margin 9}}]
+                       text-margin 9
+                       label-margin 28}}]
 
   (let [[x y x1 x2 y1 y2] (match [orientation]
                                  [(:or :left :right)] [:x :y :x1 :x2 :y1 :y2]
@@ -102,13 +109,25 @@
                       [(:or :left :top)] -1
                       [(:or :right :bottom)] 1)]
 
-    (into [:g {:class (str "axis " (name orientation))}
-           [:line.rule (apply hash-map (interleave [y1 y2] (:range scale)))]]
-          (map (fn [d]
-                 [:g.tick.major-tick {:transform (translate {x 0 y (scale d)})}
-                  [:text {x (* parity text-margin)} (formatter d)]
-                  [:line {x1 0 x2 (* parity major-tick-width)}]])
-               ticks))))
+    [:g {:class (str "axis " (name orientation))}
+     [:line.rule (apply hash-map (interleave [y1 y2] (:range scale)))]
+
+     (map (fn [d]
+            [:g.tick.major-tick {:transform (translate {x 0 y (scale d)})}
+             [:text {x (* parity text-margin)} (formatter d)]
+             [:line {x1 0 x2 (* parity major-tick-width)}]])
+          ticks)
+
+     (when label
+       [:text.label {:transform (str (translate {x (* parity label-margin)
+                                                 y (mean (:range scale))})
+                                     " "
+                                     (match [orientation]
+                                            [:left] (rotate -90)
+                                            [:right] (rotate 90)
+                                            :else ""))}
+        label])
+     ]))
 
 
 (def ArcMax (- Tau 0.0000001))
