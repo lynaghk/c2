@@ -30,6 +30,12 @@
          [{:x x :y y}] (recur [x y])
          [s] (str "scale(" s ")")))
 
+(defn rotate
+  ([angle] (rotate angle [0 0]))
+  ([angle coordinates]
+     (let [[x y] (->xy coordinates)]
+       (str "rotate(" angle "," x "," y ")"))))
+
 
 (defn ^:cljs get-bounds
   "Returns map of `{:x :y :width :height}` containing SVG element bounding box.
