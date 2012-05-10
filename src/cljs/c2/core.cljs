@@ -7,20 +7,6 @@
             [clojure.set :as set]
             [clojure.string :as string]))
 
-;;Seq over native JavaScript node collections
-(extend-type js/NodeList
-  ISeqable
-  (-seq [array] (array-seq array 0)))
-(extend-type js/HTMLCollection
-  ISeqable
-  (-seq [array] (array-seq array 0)))
-
-;;This is required so that DOM nodes can be used in sets
-(extend-type js/Node
-  IHash
-  (-hash [x] x))
-
-
 ;;Attach data to live dom elements
 (def node-data-key "c2")
 (defn attach-data [$node d]

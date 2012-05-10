@@ -7,6 +7,19 @@
             [goog.dom.classes :as gclasses]
             [goog.style :as gstyle]))
 
+;;Seq over native JavaScript node collections
+(extend-type js/NodeList
+  ISeqable
+  (-seq [array] (array-seq array 0)))
+(extend-type js/HTMLCollection
+  ISeqable
+  (-seq [array] (array-seq array 0)))
+
+;;Required for DOM nodes to be used in sets
+(extend-type js/Node
+  IHash
+  (-hash [x] x))
+
 ;; Regular expression that parses a CSS-style id and class from a tag name. From Weavejester's Hiccup.
 (def re-tag #"([^\s\.#]+)(?:#([^\s\.#]+))?(?:\.([^\s#]+))?")
 
