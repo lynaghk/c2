@@ -12,7 +12,7 @@
 (defn attach-data [$node d]
   (set! (.-__c2data__ $node) d)
   $node)
-(defn read-data [$node d]
+(defn read-data [$node]
   (let [d (.-__c2data__ $node)]
     (if (undefined? d) nil d)))
 
