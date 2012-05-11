@@ -19,7 +19,7 @@
   :min-lein-version "2.0.0"
   
   :plugins [[com.keminglabs/cljx "0.1.2"]
-            [lein-cljsbuild "0.1.8"]
+            [lein-cljsbuild "0.1.9"]
             [lein-midje "2.0.0-SNAPSHOT"]
             [lein-marginalia "0.7.0"]]
 
