@@ -61,7 +61,7 @@
 (defmethod select-all :selector
   ([selector] (.querySelectorAll js/document selector))
   ([selector container] (.querySelectorAll (select container) selector)))
-(defmethod select-all :dom [nodes] nodes)
+
 
 
 (defn children
