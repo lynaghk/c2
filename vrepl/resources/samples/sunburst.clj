@@ -1,6 +1,6 @@
 (ns sunburst
   (:refer-clojure :exclude [partition]) ;;avoid name conflict with base "partition" function
-  (:use [c2.core :only [unify style]]
+  (:use [c2.core :only [unify]]
         [c2.maths :only [sqrt sin cos Tau]] ;;Life's short, don't waste it writing 2*Pi
         [c2.svg :only [arc]]
         [c2.layout.partition :only [partition]]

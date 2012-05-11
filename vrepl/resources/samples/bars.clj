@@ -1,5 +1,5 @@
 (ns bars
-  (:use [c2.core :only [unify style]])
+  (:use [c2.core :only [unify]])
   (:require [c2.scale :as scale]))
 
 
@@ -10,7 +10,7 @@
 
   [:div#bars
    (unify data (fn [[label val]]
-                 [:div {:style (style {:height bar-height
-                                       :width (s val)
-                                       :background-color "gray"})}
+                 [:div.bar {:style (str "height: " bar-height ";"
+                                        "width: " (s val) ";"
+                                        "background-color: gray;")}
                   [:span {:style "color: white;"} label]]))])

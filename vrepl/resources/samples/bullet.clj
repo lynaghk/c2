@@ -1,6 +1,5 @@
 (ns bullet
-  (:use [c2.core :only [unify style]]
-        [c2.util :only [half]])
+  (:use [c2.core :only [unify]])
   (:require [c2.scale :as scale]
             [vomnibus.color-brewer :as color-brewer]))
 
@@ -57,13 +56,13 @@
                (map (fn [[idx m]]
                       [:rect {:class (str "measure s" idx)
                               :height measure-height, :width (s m)
-                              :y (half (- range-height measure-height))}])
+                              :y (* 0.5 (- range-height measure-height))}])
                     (map-indexed vector (sort > measures)))
 
                ;;Markers
                (map (fn [[idx m]]
                       [:rect.marker {:height marker-height, :width 2
-                                     :x (s m), :y (half (- range-height marker-height))}])
+                                     :x (s m), :y (* 0.5 (- range-height marker-height))}])
                     (map-indexed vector (sort > markers)))]
               
               ]))))
