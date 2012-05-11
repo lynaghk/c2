@@ -245,7 +245,8 @@
                                    map-attrs        (first content)]
 
                                (let [[attr raw-children] (if (map? map-attrs)
-                                                           [(merge tag-attrs map-attrs) (next content)]
+                                                           [(merge-with #(str %1 " " %2) tag-attrs map-attrs)
+                                                            (next content)]
                                                            [tag-attrs content])
                                      ;;Explode children seqs in place
                                      children (mapcat #(if (and (not (vector? %)) (seq? %))
