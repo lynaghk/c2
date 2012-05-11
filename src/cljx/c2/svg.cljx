@@ -111,12 +111,12 @@
 
     [:g {:class (str "axis " (name orientation))}
      [:line.rule (apply hash-map (interleave [y1 y2] (:range scale)))]
-
-     (map (fn [d]
-            [:g.tick.major-tick {:transform (translate {x 0 y (scale d)})}
-             [:text {x (* parity text-margin)} (formatter d)]
-             [:line {x1 0 x2 (* parity major-tick-width)}]])
-          ticks)
+     [:g.ticks
+      (map (fn [d]
+             [:g.tick.major-tick {:transform (translate {x 0 y (scale d)})}
+              [:text {x (* parity text-margin)} (formatter d)]
+              [:line {x1 0 x2 (* parity major-tick-width)}]])
+           ticks)]
 
      (when label
        [:text.label {:transform (str (translate {x (* parity label-margin)
