@@ -8,12 +8,19 @@
    keywords into JavaScript strings."
   [x]
   (cond
-   (string? x) x
+   (string? x)  x
    (keyword? x) (name x)
-   (map? x) (.-strobj (reduce (fn [m [k v]]
-                                (assoc m (clj->js k) (clj->js v))) {} x))
-   (coll? x) (apply array (map clj->js x))
+   (map? x)     (reduce (fn [o [k v]]
+                          (let [key (clj->js k)]
+                            (when-not (string? key)
+                              (throw "Cannot convert; JavaScript map keys must be strings"))
+                            (aset o key (clj->js v))
+                            o))
+                        (js-obj) x)
+   (coll? x)    (apply array (map clj->js x))
    :else x))
+
+
 
 (defn ->coll
   "Convert something into a collection, if it's not already."
