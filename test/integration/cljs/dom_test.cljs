@@ -1,6 +1,6 @@
 (ns c2.dom-test
   (:use-macros [c2.util :only [p pp profile]])
-  (:use [c2.dom :only [attr build-dom-elem]]))
+  (:use [c2.dom :only [attr build-dom-elem merge! append! text]]))
 
 (set! *print-fn* #(.log js/console %))
 

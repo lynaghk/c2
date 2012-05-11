@@ -1,5 +1,5 @@
 (ns c2.dom
-  (:use-macros [c2.util :only [p timeout]]
+  (:use-macros [c2.util :only [p pp timeout]]
                [clojure.core.match.js :only [match]]
                [iterate :only [iter]])
   (:require [clojure.string :as string]
@@ -189,6 +189,9 @@
 (defn add-class! [el class] (classed! el class true))
 (defn remove-class! [el class] (classed! el class false))
 
+(defn whitespace-node? [$n]
+  (and (= 3 (.-nodeType $n))
+       (re-matches #"^\s+$" (.-textContent $n))))
 
 ;;Call this fn with a fn that should be executed on the next browser animation frame.
 (def request-animation-frame
@@ -201,20 +204,26 @@
    Boolean kwarg `:defer-attr` to set attributes on next animation frame, defaults to `false`. "
   [$node el & {:keys [defer-attr]
                :or {defer-attr false}}]
+
   (let [el (canonicalize el)]
     (when (not= (.toLowerCase (.-nodeName $node))
                 (.toLowerCase (name (:tag el))))
+      (p $node)
+      (pp el)
       (throw "Cannot merge el into node of a different type"))
 
     (if defer-attr
       (request-animation-frame #(attr $node (:attr el)) $node)
       (attr $node (:attr el)))
 
-    (when-let [txt (first (filter string? (:children el)))]
-      (text $node txt))
-    (iter {for [dom-child el-child] in (map vector (children $node)
-                                            (remove string? (:children el)))}
-          (merge! dom-child el-child :defer-attr defer-attr))
+    ;;merge children (implicitly assumes that nodes by index match up)
+    (doseq [[$c c] (map vector
+                        (remove whitespace-node? (.-childNodes $node))
+                        (:children el))]
+      (match [[(.-nodeType $c) c]]
+             [[1 (m :when map?)]]    (merge! $c m :defer-attr defer-attr)
+             [[3 (s :when string?)]] (set! (.-textContent $c) s)
+             :else (do (p $c) (pp c) (throw "Cannot merge."))))
     $node))
 
 (defn canonicalize
