@@ -30,4 +30,6 @@
                      [:path.state {:d (geo->svg (get states state-name)
                                                 :projection proj)
                                    :stroke "black"
-                                   :fill (color-scale val)}]))))
+                                   :fill (color-scale val)}]))
+
+           (dom/remove! $svg)))
