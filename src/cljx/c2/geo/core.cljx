@@ -9,12 +9,6 @@
 
 ;;Use JS native map and join fns; this is about 3 times faster than using CLJS seqs and str.
 ^:cljs (do
-         ;;taken from ClojureScript master; remove once a new release is cut.
-         (defn into-array
-           ([aseq]
-              (into-array nil aseq))
-           ([type aseq]
-              (reduce (fn [a x] (.push a x) a) (array) aseq)))
          
          (defn ->arr [c]
            (if (= js/Array (type c))
