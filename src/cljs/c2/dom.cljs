@@ -168,9 +168,11 @@
                  (do (doseq [[k v] m] (attr el k v))
                      el)))
   ([el k v]
-     (if (= :style k)
-       (style el v)
-       (.setAttribute el (name k) v))
+     (if (nil? v)
+       (.removeAttribute el (name k))
+       (if (= :style k)
+         (style el v)
+         (.setAttribute el (name k) v)))
      el))
 
 (defn text
