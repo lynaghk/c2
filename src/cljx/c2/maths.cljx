@@ -41,11 +41,24 @@
   [(apply min xs)
    (apply max xs)])
 
+
+;;TODO: replace mean and median with smarter algorithms for better performance.
 (defn mean
   "Arithemetic mean of collection"
   [xs]
   (/ (reduce + xs)
      (count xs)))
+
+(defn median
+  "Median of a collection."
+  [xs]
+  (let [sorted (sort xs)
+        n (count xs)]
+    (if (odd? n)
+      (nth sorted (/ (inc n) 2))
+      (let [mid (/ n 2)]
+        (mean [(nth sorted (floor mid))
+               (nth sorted (ceil mid))])))))
 
 (defn irange
   "Inclusive range; same as core/range, but includes the end."
