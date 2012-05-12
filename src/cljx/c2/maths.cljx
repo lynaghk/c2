@@ -54,11 +54,12 @@
   [xs]
   (let [sorted (sort xs)
         n (count xs)]
-    (if (odd? n)
-      (nth sorted (/ (inc n) 2))
-      (let [mid (/ n 2)]
-        (mean [(nth sorted (floor mid))
-               (nth sorted (ceil mid))])))))
+    (cond
+     (= n 1)  (first sorted)
+     (odd? n) (nth sorted (/ (inc n) 2))
+     :else    (let [mid (/ n 2)]
+                (mean [(nth sorted (floor mid))
+                       (nth sorted (ceil mid))])))))
 
 (defn irange
   "Inclusive range; same as core/range, but includes the end."
