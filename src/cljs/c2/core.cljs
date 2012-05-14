@@ -95,7 +95,7 @@
 
     ;;For each datum, update existing nodes and add new ones
     (doseq [[idx d] (map-indexed vector data)]
-      (let [new-node (mapping d idx)]
+      (when-let [new-node (mapping d idx)]
         ;;If there's an existing node
         (if-let [old (existing-nodes-by-key (key-fn d idx))]
           (do
