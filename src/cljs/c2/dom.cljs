@@ -62,7 +62,10 @@
   ([selector] (.querySelectorAll js/document selector))
   ([selector container] (.querySelectorAll (select container) selector)))
 
-
+(defn matches-selector?
+  "Does live `node` match CSS `selector`?"
+  [node selector]
+  (.webkitMatchesSelector node selector))
 
 (defn children
   "Return the children of a live DOM element."

@@ -4,9 +4,6 @@
   (:require [c2.dom :as dom]
             [goog.events :as gevents]))
 
-(defn matches-selector? [node selector]
-  (.webkitMatchesSelector node selector))
-
 (defn on-load
   "Execute fn when browser load event fires."
   [f]
@@ -35,7 +32,7 @@
                      (fn [event]
                        ;;Check to see if the target is what we want to listen to.
                        ;;This could be, say, a data-less button that is a child of a node with c2 data.
-                       (if (matches-selector? (.-target event) selector)
+                       (if (dom/matches-selector? (.-target event) selector)
                          ;;Loop through the parent nodes of the event origin node, event.target, until we reach one with c2 data attached.
                          (loop [$node (.-target event)]
                            (if-let [d (read-data $node)]
