@@ -7,7 +7,6 @@ pom.xml
 lib
 classes
 build
-resources/*
 out/
 .generated
 .lein*
