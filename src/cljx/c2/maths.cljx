@@ -5,8 +5,9 @@
          (:use-macros [c2.util :only [combine-with]]))
 
 
-(def Pi 3.141592653589793)
+(def Pi Math/PI)
 (def Tau (* 2 Pi))
+(def e Math/E)
 (def radians-per-degree (/ Pi 180))
 (defn rad [x] (* radians-per-degree x))
 
