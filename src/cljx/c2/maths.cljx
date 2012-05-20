@@ -8,11 +8,15 @@
 (def Pi 3.141592653589793)
 (def Tau (* 2 Pi))
 (def radians-per-degree (/ Pi 180))
+(defn rad [x] (* radians-per-degree x))
 
 
 (defn sin [x] (Math/sin x))
+(defn asin [x] (Math/asin x))
 (defn cos [x] (Math/cos x))
+(defn acos [x] (Math/acos x))
 (defn tan [x] (Math/tan x))
+(defn atan [x] (Math/atan x))
 
 (defn expt
   ([x] (Math/exp x))
