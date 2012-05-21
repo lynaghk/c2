@@ -1,9 +1,14 @@
 ^:clj (ns c2.scale
         (:use [c2.util :only [c2-obj]]
-              [c2.maths :only [log10]]))
+              [c2.maths :only [log expt] :rename {log logg}]))
 ^:cljs (ns c2.scale
          (:use-macros [c2.util :only [c2-obj]])
-         (:use [c2.maths :only [log10]]))
+         (:use [c2.maths :only [log expt] :rename {log logg}]))
+
+(defprotocol IInvertable
+  (invert [scale] "Inverted scale"))
+
+
 
 ;;Linear scale
 ;;
@@ -20,7 +25,29 @@
                         (+ (first range)
                            (* range-length
                               (/ (- x (first domain))
-                                 domain-length))))))
+                                 domain-length)))))
+        IInvertable
+        (invert [this]
+                (assoc this
+                  :domain (:range this)
+                  :range (:domain this))))
+
+(declare log)
+
+;;Power scale
+;;
+;;Kwargs:
+;;> *:domain* domain of scale, default [0 1]
+;;
+;;> *:range* range of scale, default [0 1]
+(c2-obj power {:domain [0 1]
+               :range  [0 1]}
+        
+        clojure.lang.IFn
+        (invoke [_ x]
+                ((comp (linear :domain (map expt domain)
+                               :range range)
+                       expt) x)))
 
 ;;Logarithmic scale
 ;;
@@ -30,8 +57,10 @@
 ;;> *:range* range of scale, default [0 1]
 (c2-obj log {:domain [1 10]
              :range  [0 1]}
+        
         clojure.lang.IFn
         (invoke [_ x]
-                ((comp (linear :domain (map log10 domain)
+                ((comp (linear :domain (map logg domain)
                                :range range)
-                       log10) x)))
+                       logg) x)))
+
