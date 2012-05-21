@@ -1,9 +1,11 @@
 ^:clj (ns c2.scale
         (:use [c2.util :only [c2-obj]]
-              [c2.maths :only [log expt] :rename {log logg}]))
+              [c2.maths :only [expt]])
+        (:require [c2.maths :as maths]))
 ^:cljs (ns c2.scale
          (:use-macros [c2.util :only [c2-obj]])
-         (:use [c2.maths :only [log expt] :rename {log logg}]))
+         (:use [c2.maths :only [expt]])
+         (:require [c2.maths :as maths]))
 
 (defprotocol IInvertable
   (invert [scale] "Inverted scale"))
@@ -60,7 +62,7 @@
         
         clojure.lang.IFn
         (invoke [_ x]
-                ((comp (linear :domain (map logg domain)
+                ((comp (linear :domain (map maths/log domain)
                                :range range)
-                       logg) x)))
+                       maths/log) x)))
 
