@@ -31,8 +31,8 @@
         IInvertable
         (invert [this]
                 (assoc this
-                  :domain (:range this)
-                  :range (:domain this))))
+                  :domain range
+                  :range domain)))
 
 (declare log)
 
