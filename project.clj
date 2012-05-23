@@ -1,4 +1,4 @@
-(defproject com.keminglabs/c2 "0.1.1-SNAPSHOT"
+(defproject com.keminglabs/c2 "0.1.1"
   :description "Declarative data visualization in Clojure(Script)."
   :url "http://keminglabs.com/c2/"
   :license {:name "BSD" :url "http://www.opensource.org/licenses/BSD-3-Clause"}
