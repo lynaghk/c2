@@ -101,13 +101,13 @@
                        text-margin 9
                        label-margin 28}}]
 
-  (let [[x y x1 x2 y1 y2] (match [orientation]
-                                 [(:or :left :right)] [:x :y :x1 :x2 :y1 :y2]
-                                 [(:or :top :bottom)] [:y :x :y1 :y2 :x1 :x2])
+  (let [[x y x1 x2 y1 y2] (case orientation
+                            (:left :right) [:x :y :x1 :x2 :y1 :y2]
+                            (:top :bottom) [:y :x :y1 :y2 :x1 :x2])
 
-        parity (match [orientation]
-                      [(:or :left :top)] -1
-                      [(:or :right :bottom)] 1)]
+        parity (case orientation
+                 (:left :top) -1
+                 (:right :bottom) 1)]
 
     [:g {:class (str "axis " (name orientation))}
      [:line.rule (apply hash-map (interleave [y1 y2] (:range scale)))]
@@ -122,10 +122,10 @@
        [:text.label {:transform (str (translate {x (* parity label-margin)
                                                  y (mean (:range scale))})
                                      " "
-                                     (match [orientation]
-                                            [:left] (rotate -90)
-                                            [:right] (rotate 90)
-                                            :else ""))}
+                                     (case orientation
+                                       :left (rotate -90)
+                                       :right (rotate 90)
+                                       ""))}
         label])
      ]))
 
