@@ -8,4 +8,5 @@
             [c2.dom :as dom]
             [reflex.core :as reflex]))
 
+(def node-data singult/node-data)
 (def unify singult/unify)

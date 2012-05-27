@@ -38,11 +38,11 @@
 (defn select
   "Select a single DOM node via CSS selector, optionally scoped by second arg."
   ([selector] (.querySelector js/document selector))
-  ([selector container] (.querySelector (select container) selector)))
+  ([selector container] (.querySelector (->dom container) selector)))
 (defn select-all
   "Like select, but returns a collection of nodes."
   ([selector] (.querySelectorAll js/document selector))
-  ([selector container] (.querySelectorAll (select container) selector)))
+  ([selector container] (.querySelectorAll (->dom container) selector)))
 
 (defn matches-selector?
   "Does live `node` match CSS `selector`?"
@@ -73,7 +73,7 @@
    Returns live DOM child."
   [container el]
   (let [el (->dom el)]
-    (gdom/insertChildAt (select container) el 0)
+    (gdom/insertChildAt (->dom container) el 0)
     el))
 
 (defn remove!
@@ -88,7 +88,7 @@
    > *new* CSS selector, live DOM node, or hiccup vector"
   [old new]
   (let [new (->dom new)]
-    (gdom/replaceNode new (select old))
+    (gdom/replaceNode new (->dom old))
     new))
 
 (defn style
@@ -158,7 +158,7 @@
 (defn classed!
   "Add or remove `class` to element based on boolean `classed?`, returning element."
   [el class classed?]
-  (gclasses/enable (select el) class classed?))
+  (gclasses/enable (->dom el) class classed?))
 
 ;;TODO: make these kind of shortcuts macros for better performance.
 (defn add-class! [el class] (classed! el class true))
