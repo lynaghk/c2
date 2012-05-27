@@ -1,5 +1,5 @@
 (ns c2.dom
-  (:use-macros [c2.util :only [p pp timeout]]
+  (:use-macros [c2.util :only [p pp timeout bind!]]
                [clojure.core.match.js :only [match]]
                [iterate :only [iter]])
   (:require [clojure.string :as string]

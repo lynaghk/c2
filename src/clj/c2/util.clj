@@ -1,4 +1,5 @@
-(ns c2.util)
+(ns c2.util
+  (:use [reflex.macros :only [computed-observable]]))
 
 (defmacro p
   "Print and return native JavaScript argument."
@@ -54,3 +55,17 @@
     (and (coll? ~A) (coll? ~B)) (map ~op ~A ~B)
     (and (number? ~A) (coll? ~B)) (map ~op (replicate (count ~B) ~A)  ~B)
     (and (coll? ~A) (number? ~B)) (map ~op ~A (replicate (count ~A) ~B))))
+
+
+
+(defmacro abind!
+  "Append-bind: renders `hiccup-el` and appends to `parent`.
+   Recalculates `hiccup-el` and updates DOM whenever any of the atoms dereferenced within `hiccup-el` changes state.
+   Returns computed observable of hiccup element."
+  [parent hiccup-el]
+  `(let [co# (computed-observable ~hiccup-el)
+         $e# (c2.dom/append! ~parent (singult.core/render @co#))]
+    
+     (add-watch co# :update-dom #(singult.core/merge! $e# @co#))
+  
+    co#))
