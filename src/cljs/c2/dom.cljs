@@ -158,7 +158,7 @@
 (defn classed!
   "Add or remove `class` to element based on boolean `classed?`, returning element."
   [el class classed?]
-  (gclasses/enable (->dom el) class classed?))
+  (gclasses/enable (->dom el) (name class) classed?))
 
 ;;TODO: make these kind of shortcuts macros for better performance.
 (defn add-class! [el class] (classed! el class true))
