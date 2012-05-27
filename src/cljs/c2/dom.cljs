@@ -20,35 +20,27 @@
   IHash
   (-hash [x] x))
 
+(declare select)
 
-(defn dom-element?
-  "Live DOM elements have JavaScript nodeName defined."
-  [x]
-  (not (undefined? (.-nodeName x))))
+(defprotocol IDom
+  (->dom [x] "Converts x to a live DOM node"))
 
-(defn node-type
-  "Check node type; used as a dispatch fn."
-  [node]
-  (cond
-   (vector? node)      :hiccup   ;;Hiccup vector
-   (map? node)         :chiccup  ;;Hiccup map representation
-   (string? node)      :selector ;;CSS selector string
-   (dom-element? node) :dom      ;;It's an actual DOM node
-   ))
+(extend-protocol IDom
+  string
+  (->dom [selector] (select selector))
 
-(defmulti select
-  "Select a single DOM node via CSS selector, optionally scoped by second arg.
-   If passed live DOM node, just return it."
-  node-type)
-(defmethod select :selector
+  js/Node
+  (->dom [node] node)
+
+  PersistentVector
+  (->dom [v] (singult/render v)))
+
+(defn select
+  "Select a single DOM node via CSS selector, optionally scoped by second arg."
   ([selector] (.querySelector js/document selector))
   ([selector container] (.querySelector (select container) selector)))
-(defmethod select :dom [node] node)
-
-(defmulti select-all
+(defn select-all
   "Like select, but returns a collection of nodes."
-  node-type)
-(defmethod select-all :selector
   ([selector] (.querySelectorAll js/document selector))
   ([selector container] (.querySelectorAll (select container) selector)))
 
@@ -60,36 +52,27 @@
 (defn children
   "Return the children of a live DOM element."
   [node]
-  (filter #(= 1 (.-nodeType %))
-          (.-childNodes (select node))))
+  (.children (->dom node)))
 
 (defn parent
   "Return parent of a live DOM node."
   [node]
-  (.-parentNode (select node)))
+  (.-parentNode (->dom node)))
 
 
 (defn append!
   "Make element last child of container.
-   Returns live DOM node.
-   > *container* CSS selector or live DOM node
-   > *el* hiccup vector"
+   Returns live child."
   [container el]
-  (let [el (if (dom-element? el)
-             el
-             (singult/render el))]
-    (gdom/appendChild (select container) el)
+  (let [el (->dom el)]
+    (gdom/appendChild (->dom container) el)
     el))
 
 (defn prepend!
   "Make element first child of container.
-   Returns live DOM node.
-   > *container* CSS selector or live DOM node
-   > *el* hiccup vector"
+   Returns live DOM child."
   [container el]
-  (let [el (if (dom-element? el)
-             el
-             (singult/render el))]
+  (let [el (->dom el)]
     (gdom/insertChildAt (select container) el 0)
     el))
 
@@ -97,18 +80,16 @@
   "Remove element from DOM and return it.
    > *el* CSS selector or live DOM node"
   [el]
-  (gdom/removeNode (select el)))
+  (gdom/removeNode (->dom el)))
 
 (defn replace!
-  "Replace live DOM node with a new one.
+  "Replace live DOM node with a new one, returning the latter.
    > *old* CSS selector or live DOM node
    > *new* CSS selector, live DOM node, or hiccup vector"
   [old new]
-  (let [new (condp = (node-type new)
-              :dom new
-              :hiccup (singult/render new)
-              :selector (select new))]
-    (gdom/replaceNode new (select old))))
+  (let [new (->dom new)]
+    (gdom/replaceNode new (select old))
+    new))
 
 (defn style
   "Get or set inline element style.
@@ -164,24 +145,24 @@
      el))
 
 (defn text
-  "Get or set element text."
+  "Get or set element text, returning element"
   ([el]
-     (gdom/getTextContent (select el)))
+     (let [el (->dom el)]
+       (gdom/getTextContent el)
+       el))
   ([el v]
-     (gdom/setTextContent (select el) v)))
+     (let [el (->dom el)]
+       (gdom/setTextContent el v)
+       el)))
 
 (defn classed!
-  "Add or remove `class` to `el` based on boolean `classed?`."
+  "Add or remove `class` to element based on boolean `classed?`, returning element."
   [el class classed?]
   (gclasses/enable (select el) class classed?))
 
 ;;TODO: make these kind of shortcuts macros for better performance.
 (defn add-class! [el class] (classed! el class true))
 (defn remove-class! [el class] (classed! el class false))
-
-(defn whitespace-node? [$n]
-  (and (= 3 (.-nodeType $n))
-       (re-matches #"^\s+$" (.-textContent $n))))
 
 ;;Call this fn with a fn that should be executed on the next browser animation frame.
 (def request-animation-frame
