@@ -9,7 +9,8 @@
 
                  ;;CLJS
                  [com.keminglabs/singult "0.1.0-SNAPSHOT"]
-                 [com.keminglabs/reflex "0.1.0-SNAPSHOT"]]
+                 [com.keminglabs/reflex "0.1.0-SNAPSHOT"]
+                 [com.keminglabs/cassowary "0.1.1-SNAPSHOT"]]
 
   :profiles {:dev {:dependencies [[midje "1.3.1"]
                                   [lein-midje "1.0.8"]
@@ -18,7 +19,7 @@
   :min-lein-version "2.0.0"
 
   :plugins [[com.keminglabs/cljx "0.1.2"]
-            [lein-cljsbuild "0.1.10"]
+            [lein-cljsbuild "0.2.0"]
             [lein-midje "2.0.0-SNAPSHOT"]
             [lein-marginalia "0.7.0"]]
 
@@ -50,8 +51,7 @@
 
                        :scratch {:source-path "test/scratch"
                                  :compiler {:output-to "out/scratch.js"
-                                            :libs ["singult"]
-                                            :optimizations :whitespace}}}
+                                            :optimizations :advanced}}}
 
               
               :test-commands {"integration" ["phantomjs"
