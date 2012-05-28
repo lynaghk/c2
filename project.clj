@@ -53,7 +53,7 @@
                                  :compiler {:output-to "out/scratch.js"
                                             :optimizations :advanced}}}
 
-              
+
               :test-commands {"integration" ["phantomjs"
                                              "test/integration/runner.coffee"]}}
 

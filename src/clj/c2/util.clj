@@ -58,14 +58,15 @@
 
 
 
-(defmacro abind!
-  "Append-bind: renders `hiccup-el` and appends to `parent`.
+(defmacro bind!
+  "Merges `hiccup-el` onto `el` (selector or live node).
    Recalculates `hiccup-el` and updates DOM whenever any of the atoms dereferenced within `hiccup-el` changes state.
    Returns computed observable of hiccup element."
-  [parent hiccup-el]
+  [el hiccup-el]
   `(let [co# (computed-observable ~hiccup-el)
-         $e# (c2.dom/append! ~parent (singult.core/render @co#))]
-    
-     (add-watch co# :update-dom #(singult.core/merge! $e# @co#))
+         $el# (c2.dom/->dom ~el)]
+     
+     (singult.core/merge! $el# @co#)
+     (add-watch co# :update-dom #(singult.core/merge! $el# @co#))
   
     co#))
