@@ -148,8 +148,7 @@
   "Get or set element text, returning element"
   ([el]
      (let [el (->dom el)]
-       (gdom/getTextContent el)
-       el))
+       (gdom/getTextContent el)))
   ([el v]
      (let [el (->dom el)]
        (gdom/setTextContent el v)
