@@ -8,7 +8,7 @@
                  [clj-iterate "0.96"]
 
                  ;;CLJS
-                 [com.keminglabs/singult "0.1.0-SNAPSHOT"]
+                 [com.keminglabs/singult "0.1.0"]
                  [com.keminglabs/reflex "0.1.0-SNAPSHOT"]
                  [com.keminglabs/cassowary "0.1.1-SNAPSHOT"]]
 
