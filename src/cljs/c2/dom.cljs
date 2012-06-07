@@ -1,9 +1,11 @@
 (ns c2.dom
+  (:refer-clojure :exclude [val])
   (:use-macros [c2.util :only [p pp timeout bind!]]
                [clojure.core.match.js :only [match]])
   (:require [clojure.string :as string]
             [singult.core :as singult]
             [goog.dom :as gdom]
+            [goog.dom.forms :as gforms]
             [goog.dom.classes :as gclasses]
             [goog.style :as gstyle]))
 
@@ -152,6 +154,16 @@
   ([el v]
      (let [el (->dom el)]
        (gdom/setTextContent el v)
+       el)))
+
+(defn val
+  "Get or set element value."
+  ([el]
+     (let [el (->dom el)]
+       (gforms/getValue el)))
+  ([el v]
+     (let [el (->dom el)]
+       (gforms/setValue el v)
        el)))
 
 (defn classed!
