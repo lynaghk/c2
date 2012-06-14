@@ -11,13 +11,17 @@
 
 (defn on-raw
   "Attach `event-type` handler `f` to `node`, a CSS selector or live DOM node.
-   Event type is something like `:click` or `:mousemove`."
-  [node event-type f]
-  (gevents/listen (dom/->dom node) (name event-type) f))
+   Event type is something like `:click` or `:mousemove`.
+   Optional :capture boolean kwarg to fire listener in capture phase (default false)."
+  [node event-type f
+   & {:keys [capture]
+      :or {capture false}}]
+  (gevents/listen (dom/->dom node) (name event-type) f capture))
 
 (defn on
   "Attach delegate `event-type` event handler `f` to `node` whose children were created via `c2.core/unify!`, scoped by optional `selector`.
    Handler is called with datum, $node, and the event object.
+   Optional :capture boolean kwarg to fire listener in capture phase (default false).
 
    Example usage:
 
@@ -26,7 +30,9 @@
 
    This method should be preferred over attaching event handlers to individual nodes created by a `unify!` call because it creates a single event handler on the parent instead of a handler on each child."
   ([node event-type f] (on node "*" event-type f))
-  ([node selector event-type f]
+  ([node selector event-type f
+    & {:keys [capture]
+       :or {capture false}}]
      (gevents/listen (dom/->dom node)
                      (name event-type)
                      (fn [event]
@@ -39,7 +45,8 @@
                              ;;Then, call the handler on this node
                              (f d $node event)
                              (if-let [parent (dom/parent $node)]
-                               (recur parent)))))))))
+                               (recur parent))))))
+                     capture)))
 
 
 
