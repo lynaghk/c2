@@ -104,19 +104,22 @@
 
    `(style el :keyword val)`   sets single style, returns element"
   ([el] (throw (js/Error. "TODO: return map of element styles")))
-  ([el x] (match [x]
-                 [(k :when keyword?)] (gstyle/getComputedStyle el (name k))
-                 [(m :when map?)]
-                 (do
-                   (doseq [[k v] m] (style el k v))
-                   el)))
-  ([el k v] (gstyle/setStyle el (name k)
-                             (match [v]
-                                    [s :when string?] s
-                                    [n :when number?]
-                                    (if (#{:height :width :top :left :bottom :right} (keyword k))
-                                      (str n "px")
-                                      n)))
+  ([el x]
+     (let [el (->dom el)]
+       (match [x]
+              [(k :when keyword?)] (gstyle/getComputedStyle el (name k))
+              [(m :when map?)]
+              (do
+                (doseq [[k v] m] (style el k v))
+                el))))
+  ([el k v]
+     (gstyle/setStyle (->dom el) (name k)
+                      (match [v]
+                             [s :when string?] s
+                             [n :when number?]
+                             (if (#{:height :width :top :left :bottom :right} (keyword k))
+                               (str n "px")
+                               n)))
      el))
 
 (defn attr
@@ -129,28 +132,30 @@
    `(attr el {:keyword val})` sets element attributes according to map, returns element
 
    `(attr el :keyword val)`   sets single attr, returns element"
-  ([el] (let [attrs (.-attributes el)]
+  ([el] (let [attrs (.-attributes (->dom el))]
           (into {} (for [i (range (.-length attrs))]
                      [(keyword  (.-name (aget attrs i)))
                       (.-value (aget attrs i))]))))
-  ([el x] (match [x]
-                 [(k :when keyword?)] (.getAttribute el (name k))
-                 [(m :when map?)]
-                 (do (doseq [[k v] m] (attr el k v))
-                     el)))
+  ([el x]
+     (let [el (->dom el)]
+       (match [x]
+              [(k :when keyword?)] (.getAttribute el (name k))
+              [(m :when map?)]
+              (do (doseq [[k v] m] (attr el k v))
+                  el))))
   ([el k v]
-     (if (nil? v)
-       (.removeAttribute el (name k))
-       (if (= :style k)
-         (style el v)
-         (.setAttribute el (name k) v)))
-     el))
+     (let [el (->dom el)]
+       (if (nil? v)
+         (.removeAttribute el (name k))
+         (if (= :style k)
+           (style el v)
+           (.setAttribute el (name k) v)))
+       el)))
 
 (defn text
   "Get or set element text, returning element"
   ([el]
-     (let [el (->dom el)]
-       (gdom/getTextContent el)))
+     (gdom/getTextContent (->dom el)))
   ([el v]
      (let [el (->dom el)]
        (gdom/setTextContent el v)
@@ -159,8 +164,7 @@
 (defn val
   "Get or set element value."
   ([el]
-     (let [el (->dom el)]
-       (gforms/getValue el)))
+     (gforms/getValue (->dom el)))
   ([el v]
      (let [el (->dom el)]
        (gforms/setValue el v)
