@@ -9,8 +9,7 @@
 
                  ;;CLJS
                  [com.keminglabs/singult "0.1.2"]
-                 [com.keminglabs/reflex "0.1.0-SNAPSHOT"]
-                 [com.keminglabs/cassowary "0.1.1-SNAPSHOT"]]
+                 [com.keminglabs/reflex "0.1.0"]]
 
   :profiles {:dev {:dependencies [[midje "1.3.1"]
                                   [lein-midje "1.0.8"]
