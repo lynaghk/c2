@@ -17,7 +17,7 @@ C2 encourages a "data-driven" approach to application design.
 Compose pure functions to map your data to native Clojure vectors and maps that represent the DOM, and then let the library handle rendering into actual elements (on the clientside) or a string of markup (on the serverside).
 
 In a browser, C2 handles DOM updates as well, so it will add/remove nodes and set attributes/styles when your data changes so you don't have to deal with the incidental state and complexity of low-level, imperative manipulation.
-To see what this "data-driven" approach looks like in a simple application, see this [C2-powered todo list](https://github.com/lynaghk/c2-demos/todoMVC/).
+To see what this "data-driven" approach looks like in a simple application, see this [C2-powered todo list](https://github.com/lynaghk/c2-demos/tree/master/todoMVC).
 
 See also:
 
@@ -95,8 +95,8 @@ If you want to "change" an atom, you point it to another immutable value.
 To get at the value, you have to explicitly dereference it using the `@` syntax (e.g., `@a ;;=> "stuff pointed at by a"`)
 
 C2 takes advantage of this to automatically setup *bindings*.
-If, in the previous example, the bar chart's data was dereferenced from an atom (rather than being inlined as `{"A" 1, "B" 2, "C" 4, "D" 3}`), then the `bind!` macro would automatically watch that atom and re-render the view when the atom pointed to a new value.
-(Watchers will be added to every atom that is dereferenced in the body of `bind!`.)
+In the previous example, if the bar chart's data were dereferenced from an atom rather than being inlined (`{"A" 1, "B" 2, "C" 4, "D" 3}`), then the `bind!` macro would automatically watch that atom and re-render the view when the atom pointed to a new value.
+(Watchers are added to every atom that is dereferenced within `bind!`.)
 
 No animation
 ------------
