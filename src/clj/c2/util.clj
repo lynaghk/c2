@@ -1,4 +1,5 @@
-(ns c2.util)
+(ns c2.util
+  (:use [reflex.macros :only [computed-observable]]))
 
 (defmacro p
   "Print and return native JavaScript argument."
@@ -54,3 +55,18 @@
     (and (coll? ~A) (coll? ~B)) (map ~op ~A ~B)
     (and (number? ~A) (coll? ~B)) (map ~op (replicate (count ~B) ~A)  ~B)
     (and (coll? ~A) (number? ~B)) (map ~op ~A (replicate (count ~A) ~B))))
+
+
+
+(defmacro bind!
+  "Merges `hiccup-el` onto `el` (selector or live node).
+   Recalculates `hiccup-el` and updates DOM whenever any of the atoms dereferenced within `hiccup-el` changes state.
+   Returns computed observable of hiccup element."
+  [el hiccup-el]
+  `(let [co# (computed-observable ~hiccup-el)
+         $el# (c2.dom/->dom ~el)]
+     
+     (singult.core/merge! $el# @co#)
+     (add-watch co# :update-dom #(singult.core/merge! $el# @co#))
+  
+    co#))

@@ -132,5 +132,3 @@ For ClojureScript-specific integration testing, you can run the highly advanced,
 or, if you're too cool to go headless:
 
     lein cljsbuild once
-
-then open up `test/integration/runner.html` in your browser.

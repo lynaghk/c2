@@ -1,6 +1,6 @@
 (ns c2.event
   (:use [cljs.reader :only [read-string]]
-        [c2.core :only [read-data node-type]])
+        [c2.core :only [node-data]])
   (:require [c2.dom :as dom]
             [goog.events :as gevents]))
 
@@ -11,13 +11,17 @@
 
 (defn on-raw
   "Attach `event-type` handler `f` to `node`, a CSS selector or live DOM node.
-   Event type is something like `:click` or `:mousemove`."
-  [node event-type f]
-  (gevents/listen (dom/select node) (name event-type) f))
+   Event type is something like `:click` or `:mousemove`.
+   Optional :capture boolean kwarg to fire listener in capture phase (default false)."
+  [node event-type f
+   & {:keys [capture]
+      :or {capture false}}]
+  (gevents/listen (dom/->dom node) (name event-type) f capture))
 
 (defn on
   "Attach delegate `event-type` event handler `f` to `node` whose children were created via `c2.core/unify!`, scoped by optional `selector`.
    Handler is called with datum, $node, and the event object.
+   Optional :capture boolean kwarg to fire listener in capture phase (default false).
 
    Example usage:
 
@@ -26,8 +30,10 @@
 
    This method should be preferred over attaching event handlers to individual nodes created by a `unify!` call because it creates a single event handler on the parent instead of a handler on each child."
   ([node event-type f] (on node "*" event-type f))
-  ([node selector event-type f]
-     (gevents/listen (dom/select node)
+  ([node selector event-type f
+    & {:keys [capture]
+       :or {capture false}}]
+     (gevents/listen (dom/->dom node)
                      (name event-type)
                      (fn [event]
                        ;;Check to see if the target is what we want to listen to.
@@ -35,11 +41,12 @@
                        (if (dom/matches-selector? (.-target event) selector)
                          ;;Loop through the parent nodes of the event origin node, event.target, until we reach one with c2 data attached.
                          (loop [$node (.-target event)]
-                           (if-let [d (read-data $node)]
+                           (if-let [d (node-data $node)]
                              ;;Then, call the handler on this node
                              (f d $node event)
                              (if-let [parent (dom/parent $node)]
-                               (recur parent)))))))))
+                               (recur parent))))))
+                     capture)))
 
 
 
