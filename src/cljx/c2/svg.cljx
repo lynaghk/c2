@@ -2,13 +2,15 @@
 ;;
 ;;Coordinates to any fn can be 2-vector `[x y]` or map `{:x x :y y}`.
 ^:clj (ns c2.svg
-        (:use [c2.maths :only [Pi Tau radians-per-degree
+        (:use [c2.core :only [unify]]
+              [c2.maths :only [Pi Tau radians-per-degree
                                sin cos mean]]
               [clojure.core.match :only [match]]))
 
 ^:cljs (ns c2.svg
          (:use-macros [clojure.core.match.js :only [match]])
-         (:use [c2.maths :only [Pi Tau radians-per-degree
+         (:use [c2.core :only [unify]]
+               [c2.maths :only [Pi Tau radians-per-degree
                                 sin cos mean]])
          (:require [c2.dom :as dom]))
 
@@ -112,11 +114,11 @@
     [:g {:class (str "axis " (name orientation))}
      [:line.rule (apply hash-map (interleave [y1 y2] (:range scale)))]
      [:g.ticks
-      (map (fn [d]
-             [:g.tick.major-tick {:transform (translate {x 0 y (scale d)})}
-              [:text {x (* parity text-margin)} (formatter d)]
-              [:line {x1 0 x2 (* parity major-tick-width)}]])
-           ticks)]
+      (unify ticks
+             (fn [d]
+               [:g.tick.major-tick {:transform (translate {x 0 y (scale d)})}
+                [:text {x (* parity text-margin)} (formatter d)]
+                [:line {x1 0 x2 (* parity major-tick-width)}]]))]
 
      (when label
        [:text.label {:transform (str (translate {x (* parity label-margin)
