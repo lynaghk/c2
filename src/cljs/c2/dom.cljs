@@ -107,16 +107,16 @@
   ([el x]
      (let [el (->dom el)]
        (match [x]
-              [(k :when keyword?)] (gstyle/getComputedStyle el (name k))
-              [(m :when map?)]
+              [(k :guard keyword?)] (gstyle/getComputedStyle el (name k))
+              [(m :guard map?)]
               (do
                 (doseq [[k v] m] (style el k v))
                 el))))
   ([el k v]
      (gstyle/setStyle (->dom el) (name k)
                       (match [v]
-                             [s :when string?] s
-                             [n :when number?]
+                             [s :guard string?] s
+                             [n :guard number?]
                              (if (#{:height :width :top :left :bottom :right} (keyword k))
                                (str n "px")
                                n)))
@@ -139,8 +139,8 @@
   ([el x]
      (let [el (->dom el)]
        (match [x]
-              [(k :when keyword?)] (.getAttribute el (name k))
-              [(m :when map?)]
+              [(k :guard keyword?)] (.getAttribute el (name k))
+              [(m :guard map?)]
               (do (doseq [[k v] m] (attr el k v))
                   el))))
   ([el k v]
