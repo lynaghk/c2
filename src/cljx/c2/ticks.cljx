@@ -2,12 +2,12 @@
 ;;See also [Talbot's website](http://www.justintalbot.com/research/axis-labeling/).
 
 ^:clj (ns c2.ticks
-        (:use [c2.maths :only [sq ceil floor log10 expt]]
+        (:use [c2.maths :only [sq ceil floor log10 expt irange within?]]
               [iterate :only [iter]]))
 
 ^:cljs (ns c2.ticks
          (:use-macros [iterate :only [iter]])
-         (:use [c2.maths :only [sq ceil floor log10 expt]]))
+         (:use [c2.maths :only [sq ceil floor log10 expt irange within?]]))
 
 (def Q "Preference-ordered list of nice step sizes"
   [1 5 2 2.5 4 3])
@@ -83,12 +83,15 @@
 
    > *:length* available label spacing
 
+   > *:clamp?* don't return ticks outside of data range, defaults to true.
+
   Since there are no test input/output datasets for the labeling algorithm, I played it safe and copied the imperative algorithm from the paper.
   If you rewrite it in an understandable and performant functional style, I'll accept a pull request and buy you a bottle of whiskey."
-  [[d-min d-max] & {:keys [target-density
-                           length]
+  [[d-min d-max] & {:keys [target-density length
+                           clamp?]
                     :or {target-density 0.01 ;;Default to one label per 100 px
-                         length         500}}]
+                         length         500
+                         clamp?         true}}]
 
 
   (let [best-score (atom -2)
@@ -132,14 +135,18 @@
                                     (reset! label {:min l-min
                                                    :max l-max
                                                    :step l-step})))))))
-    (let [l @label]
+    (let [l (-> @label
+                (update-in [:min] #(if clamp? (max d-min %) %))
+                (update-in [:max] #(if clamp? (min d-max %) %)))]
       (assoc l
         :extent [(min (:min l) d-min)
                  (max (:max l) d-max)]
-        :ticks (concat (range (:min l) (:max l) (:step l)) [(:max l)])))))
-
+        :ticks (irange (:min l) (:max l) (:step l))))))
 
 (comment
+  (search [0.0 5000.0]
+          :length 900
+          :clamp? false)
   (search [1 9])
   (search [1 9] :target-density (/ 1 20))
   )

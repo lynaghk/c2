@@ -72,6 +72,12 @@
   ([start end] (concat (range start end) [end]))
   ([start end step] (concat (range start end step) [end])))
 
+(defn within?
+  "Checks if bottom <= x <= top."
+  [x [bottom top]]
+  (<= bottom x top))
+
+
 ;;element-by-element arithmetic
 ;;Code modified from Incanter
 (defn add
