@@ -21,6 +21,8 @@ To see what this "data-driven" approach looks like in a simple application, see 
 
 See also:
 
+[Google group](https://groups.google.com/forum/?hl=en&fromgroups#!forum/c2-cljs)
+
 [Example visualizations](http://keminglabs.com/c2/)
 
 [Annotated source](http://keminglabs.com/c2/docs/)
