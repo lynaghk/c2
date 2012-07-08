@@ -17,6 +17,8 @@ Is it possible to use pre/post conditions in development, but then strip them ou
 
 ticks#search should take optional kwarg to find ticks that are a proper subset or superset of the data range
 
+C2+Reflex+Singult is implementation-simple, but is far from ideal re: performance w.r.t. changes on multiple models and bindings derived from them. How can these changes be coordinated? Take ideas from: http://mdv.googlecode.com/svn/trunk/docs/design_intro.html
+
 
 Visual REPL
 -----------
