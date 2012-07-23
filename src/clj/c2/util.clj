@@ -70,3 +70,14 @@
      (add-watch co# :update-dom #(singult.core/merge! $el# @co#))
   
     co#))
+
+(defmacro with-detached
+  "Detaches `el` from DOM, runs macro body, reattaches `el` to its old parent and returns `el`."
+  [el & body]
+  `(let [$el# (c2.dom/->dom ~el)
+         $parent# (c2.dom/parent $el#)]
+     
+     (dom/remove! $el#)
+     ~@body
+     (dom/append! $parent# $el#)
+     $el#))
