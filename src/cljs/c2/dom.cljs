@@ -54,7 +54,7 @@
 (defn children
   "Return the children of a live DOM element."
   [node]
-  (.children (->dom node)))
+  (.-children (->dom node)))
 
 (defn parent
   "Return parent of a live DOM node."
