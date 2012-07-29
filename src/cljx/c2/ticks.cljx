@@ -83,7 +83,7 @@
 
    > *:length* available label spacing
 
-   > *:clamp?* don't return ticks outside of data range, defaults to true.
+   > *:clamp?* don't return ticks outside of data range, defaults to false.
 
   Since there are no test input/output datasets for the labeling algorithm, I played it safe and copied the imperative algorithm from the paper.
   If you rewrite it in an understandable and performant functional style, I'll accept a pull request and buy you a bottle of whiskey."
@@ -91,7 +91,7 @@
                            clamp?]
                     :or {target-density 0.01 ;;Default to one label per 100 px
                          length         500
-                         clamp?         true}}]
+                         clamp?         false}}]
 
 
   (let [best-score (atom -2)
@@ -135,18 +135,20 @@
                                     (reset! label {:min l-min
                                                    :max l-max
                                                    :step l-step})))))))
-    (let [l (-> @label
-                (update-in [:min] #(if clamp? (max d-min %) %))
-                (update-in [:max] #(if clamp? (min d-max %) %)))]
-      (assoc l
-        :extent [(min (:min l) d-min)
-                 (max (:max l) d-max)]
-        :ticks (irange (:min l) (:max l) (:step l))))))
+    (let [l @label
+          extent [(if clamp? d-min (min (:min l) d-min))
+                 (if clamp? d-max (max (:max l) d-max))]]
+      {:extent extent
+       :min (first extent) :max (second extent)
+       :ticks (filter #(within? % extent)
+                      (irange (:min l) (:max l) (:step l)))})))
 
 (comment
   (search [0.0 5000.0]
           :length 900
-          :clamp? false)
+          :clamp? true)
   (search [1 9])
-  (search [1 9] :target-density (/ 1 20))
+  (search [1 9] :target-density (/ 1 30))
+  (search [10.4 33.9]
+          :clamp? false)
   )
