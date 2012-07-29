@@ -70,7 +70,12 @@
   "Inclusive range; same as core/range, but includes the end."
   ([start] (range start))
   ([start end] (concat (range start end) [end]))
-  ([start end step] (concat (range start end step) [end])))
+  ([start end step]
+     (let [r (range start end step)]
+       (if (== (mod (first r) step)
+               (mod end step))
+         (concat r [end])
+         r))))
 
 (defn within?
   "Checks if bottom <= x <= top."
