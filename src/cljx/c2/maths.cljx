@@ -97,3 +97,24 @@
   ([& args] (if (= (count args) 1)
               (combine-with 1 (first args) clojure.core// div)
               (reduce (fn [A B] (combine-with A B clojure.core// div)) args))))
+
+(defn quantile
+  "Returns the quantiles of a dataset.
+
+   Kwargs:
+
+     > *:probs*: ntiles of the data to return, defaults to `[0 0.25 0.5 0.75 1]`
+
+  Algorithm is the same as R's quantile type=7.
+  Transcribed from Jason Davies; https://github.com/jasondavies/science.js/blob/master/src/stats/quantiles.js"
+  [data & {:keys [probs] :or {probs [0 0.25 0.5 0.75 1]}}]
+  (let [xs (into [] (sort data))
+        n-1 (dec (count xs))]
+    (for [q probs]
+      (let [index (inc (* q n-1))
+            lo    (int (floor index))
+            h     (- index lo)
+            a     (xs (dec lo))]
+        (if (= h 0)
+          a
+          (+ a (* h (- (xs lo) a))))))))
