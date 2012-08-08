@@ -33,7 +33,7 @@
                       p (/ (sqrt (- C (* 2 n (sin (* radians-per-degree lat)))))
                            n)]
                   [(+ (* scale p (sin t)) (first translate))
-                   (+ (* scale (- (* p (cos t)) p0))
+                   (+ (* scale (- (* p (cos t)) p0)) ;;Note that we've negated the p0 - p*cos(t) term so the projection is into a coordinate system where positive y is downward.
                       (second translate))])))
 
 
