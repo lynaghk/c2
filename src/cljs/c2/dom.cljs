@@ -9,10 +9,15 @@
             [goog.dom.classes :as gclasses]
             [goog.style :as gstyle]))
 
+;;Going down a terrible, terrible road here...
+(js* "Element.prototype.matchesSelector = Element.prototype.webkitMatchesSelector || Element.prototype.mozMatchesSelector || Element.prototype.msMatchesSelector || Element.prototype.oMatchesSelector")
+
 ;;Seq over native JavaScript node collections
+
 (extend-type js/NodeList
   ISeqable
   (-seq [array] (array-seq array 0)))
+
 (extend-type js/HTMLCollection
   ISeqable
   (-seq [array] (array-seq array 0)))
@@ -49,7 +54,7 @@
 (defn matches-selector?
   "Does live `node` match CSS `selector`?"
   [node selector]
-  (.webkitMatchesSelector node selector))
+  (.matchesSelector node selector))
 
 (defn children
   "Return the children of a live DOM element."
