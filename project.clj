@@ -8,7 +8,7 @@
                  [clj-iterate "0.96"]
 
                  ;;CLJS
-                 [com.keminglabs/singult "0.1.4"]
+                 [com.keminglabs/singult "0.1.5-SNAPSHOT"]
                  [com.keminglabs/reflex "0.1.1"]]
 
   :profiles {:dev {:dependencies [[midje "1.3.1"]
