@@ -13,19 +13,14 @@
 (js* "Element.prototype.matchesSelector = Element.prototype.webkitMatchesSelector || Element.prototype.mozMatchesSelector || Element.prototype.msMatchesSelector || Element.prototype.oMatchesSelector")
 
 ;;Seq over native JavaScript node collections
-
-(extend-type js/NodeList
-  ISeqable
-  (-seq [array] (array-seq array 0)))
+(when (js* "typeof NodeList != \"undefined\"")
+  (extend-type js/NodeList
+    ISeqable
+    (-seq [array] (array-seq array 0))))
 
 (extend-type js/HTMLCollection
   ISeqable
   (-seq [array] (array-seq array 0)))
-
-;;Required for DOM nodes to be used in sets
-(extend-type js/Node
-  IHash
-  (-hash [x] x))
 
 (declare select)
 
@@ -36,11 +31,14 @@
   string
   (->dom [selector] (select selector))
 
-  js/Node
-  (->dom [node] node)
-
   PersistentVector
   (->dom [v] (singult/render v)))
+
+(when (js* "typeof Node != \"undefined\"")
+  (extend-type js/Node
+    IDom
+    (->dom [node] node)))
+
 
 (defn select
   "Select a single DOM node via CSS selector, optionally scoped by second arg."
