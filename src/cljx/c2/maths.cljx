@@ -10,6 +10,7 @@
 (def e Math/E)
 (def radians-per-degree (/ Pi 180))
 (defn rad [x] (* radians-per-degree x))
+(defn deg [x] (/ x radians-per-degree))
 
 
 (defn sin [x] (Math/sin x))
