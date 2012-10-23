@@ -17,7 +17,7 @@
   "Convert coordinates (potentially map of `{:x :y}`) to 2-vector."
   [coordinates]
   (cond
-   (and (vector? coordinates) (= 2 (count count))) coordinates
+   (and (vector? coordinates) (= 2 (count coordinates))) coordinates
    (map? coordinates) [(:x coordinates) (:y coordinates)]))
 
 (defn translate [coordinates]
