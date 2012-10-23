@@ -4,11 +4,9 @@
 ^:clj (ns c2.svg
         (:use [c2.core :only [unify]]
               [c2.maths :only [Pi Tau radians-per-degree
-                               sin cos mean]]
-              [clojure.core.match :only [match]]))
+                               sin cos mean]]))
 
 ^:cljs (ns c2.svg
-         (:use-macros [clojure.core.match.js :only [match]])
          (:use [c2.core :only [unify]]
                [c2.maths :only [Pi Tau radians-per-degree
                                 sin cos mean]])
@@ -18,19 +16,19 @@
 (defn ->xy
   "Convert coordinates (potentially map of `{:x :y}`) to 2-vector."
   [coordinates]
-  (match [coordinates]
-         [[x y]] [x y]
-         [{:x x :y y}] [x y]))
+  (cond
+   (and (vector? coordinates) (= 2 (count count))) coordinates
+   (map? coordinates) [(:x coordinates) (:y coordinates)]))
 
 (defn translate [coordinates]
   (let [[x y] (->xy coordinates)]
     (str "translate(" x "," y ")")))
 
 (defn scale [coordinates]
-  (match [coordinates]
-         [[x y]] (str "scale(" x "," y ")")
-         [{:x x :y y}] (recur [x y])
-         [s] (str "scale(" s ")")))
+  (cond
+   (number? coordinates) (str "scale(" coordinates ")")
+   (map? coordinates) [(:x coordinates) (:y coordinates)]
+   (and (vector? coordinates) (= 2 (count count))) coordinates))
 
 (defn rotate
   ([angle] (rotate angle [0 0]))
