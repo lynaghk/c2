@@ -59,9 +59,14 @@
 (defn ->latlon
   "Convert coordinates (potentially map of `{:lat :lon}`) to 2-vector."
   [coordinates]
-  (match [coordinates]
-         [[lat lon]] [lat lon]
-         [{:lat lat :lon lon}] [lat lon]))
+  (cond
+   (and (vector? coordinates)
+        (= 2 (count coordinates)))
+   coordinates
+        
+   (map? coordinates)
+   (let [{lat :lat lon :lon} coordinates]
+     [lat lon])))
 
 (def radius-of-earth
   "Radius of OUR AWESOME PLANET, in kilometers"

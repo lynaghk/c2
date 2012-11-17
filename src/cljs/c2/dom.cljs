@@ -1,7 +1,6 @@
 (ns c2.dom
   (:refer-clojure :exclude [val])
-  (:use-macros [c2.util :only [p pp timeout bind!]]
-               [clojure.core.match.js :only [match]])
+  (:use-macros [c2.util :only [p pp timeout bind!]])
   (:require [clojure.string :as string]
             [singult.core :as singult]
             [goog.dom :as gdom]
@@ -109,20 +108,18 @@
   ([el] (throw (js/Error. "TODO: return map of element styles")))
   ([el x]
      (let [el (->dom el)]
-       (match [x]
-              [(k :guard keyword?)] (gstyle/getComputedStyle el (name k))
-              [(m :guard map?)]
-              (do
-                (doseq [[k v] m] (style el k v))
-                el))))
+       (cond
+        (keyword? x) (gstyle/getComputedStyle el (name x))
+        (map? x) (do
+                   (doseq [[k v] x] (style el k v))
+                   el))))
   ([el k v]
      (gstyle/setStyle (->dom el) (name k)
-                      (match [v]
-                             [s :guard string?] s
-                             [n :guard number?]
-                             (if (#{:height :width :top :left :bottom :right} (keyword k))
-                               (str n "px")
-                               n)))
+                      (cond
+                       (string? v) v
+                       (number? v) (if (#{:height :width :top :left :bottom :right} (keyword k))
+                                     (str v "px")
+                                     v)))
      el))
 
 (defn attr
@@ -141,11 +138,10 @@
                       (.-value (aget attrs i))]))))
   ([el x]
      (let [el (->dom el)]
-       (match [x]
-              [(k :guard keyword?)] (.getAttribute el (name k))
-              [(m :guard map?)]
-              (do (doseq [[k v] m] (attr el k v))
-                  el))))
+       (cond
+        (or (string? x) (keyword? x)) (.getAttribute el (name x))
+        (map? x) (do (doseq [[k v] m] (attr el k v))
+                     el))))
   ([el k v]
      (let [el (->dom el)]
        (if (nil? v)
