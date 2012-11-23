@@ -69,10 +69,10 @@
 
 (defn haversine
   "Calculate the great-circle distance between two lat/lon coordinates on a sphere with radius `r` (defaults to Earth radius)."
-  ([c1 c2] (haversine c1 c2 radius-of-earth))
-  ([c1 c2 r]
-     (let [[lat1 lon1] (->latlon c1)
-           [lat2 lon2] (->latlon c2)
+  ([co1 co2] (haversine co1 co2 radius-of-earth))
+  ([co1 co2 r]
+     (let [[lat1 lon1] (->latlon co1)
+           [lat2 lon2] (->latlon co2)
            square-half-chord (+ (sq (sin (/ (rad (- lat2 lat1)) 2)))
                                 (* (cos (rad lat1))
                                    (cos (rad lat2))
