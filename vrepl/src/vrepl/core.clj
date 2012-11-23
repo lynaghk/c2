@@ -15,12 +15,15 @@
 
 
 (defn reload! [vfs-filename]
-  (let [path (.getPath vfs-filename)]
-    (println "Reloading:" path)
-    (case (.getExtension vfs-filename)
-      "clj"  (output-clj! (load-file path))
-      "cljs" "CLJS not implemented yet"
-      (println "I have no idea what to do with" path))))
+  (when-not (-> vfs-filename
+              .getBaseName
+              (.startsWith "."))
+    (let [path (.getPath vfs-filename)]
+      (println "Reloading:" path)
+      (case (.getExtension vfs-filename)
+        "clj"  (output-clj! (load-file path))
+        "cljs" "CLJS not implemented yet"
+        (println "I have no idea what to do with" path)))))
 
 (defn monitor-files! [path]
   (let [fm (DefaultFileMonitor. (reify FileListener
