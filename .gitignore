@@ -1,6 +1,7 @@
 .cake
 pom.xml
 *.jar
+*.sw[po]
 *.war
 .lein-deps-sum
 .DS_Store
