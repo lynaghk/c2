@@ -130,6 +130,13 @@
      ]))
 
 
+(defn line
+  "Return a Hiccup path SVG element with the [x,y] coordinates in the points sequence connected by lines"
+  [points]
+  (let [[[x y] & xs] points]
+    [:path {:d (apply str "M" x "," y
+                           (for [[x y] xs] (str "L" x "," y)))}]))
+
 (def ArcMax (- Tau 0.0000001))
 
 (defn circle
