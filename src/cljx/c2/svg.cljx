@@ -22,11 +22,11 @@
 
 (defn translate [coordinates]
   (let [[x y] (->xy coordinates)]
-    (str "translate(" x "," y ")")))
+    (str "translate(" (float x) "," (float y) ")")))
 
 (defn scale [coordinates]
   (cond
-   (number? coordinates) (str "scale(" coordinates ")")
+   (number? coordinates) (str "scale(" (float coordinates) ")")
    (map? coordinates) [(:x coordinates) (:y coordinates)]
    (and (vector? coordinates) (= 2 (count count))) coordinates))
 
@@ -34,7 +34,7 @@
   ([angle] (rotate angle [0 0]))
   ([angle coordinates]
      (let [[x y] (->xy coordinates)]
-       (str "rotate(" angle "," x "," y ")"))))
+       (str "rotate(" (float angle) "," (float x) "," (float y) ")"))))
 
 
 (defn ^:cljs get-bounds
