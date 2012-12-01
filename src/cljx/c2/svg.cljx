@@ -12,6 +12,8 @@
                                 sin cos mean]])
          (:require [c2.dom :as dom]))
 
+;;Stub for float fn, which does not exist on cljs runtime
+^:cljs (def float identity)
 
 (defn ->xy
   "Convert coordinates (potentially map of `{:x :y}`) to 2-vector."
