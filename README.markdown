@@ -1,4 +1,3 @@
-
       _____   ___  
      / ____| |__ \ 
     | |         ) |
@@ -38,7 +37,7 @@ We have no idea what's going on, and we're going to break a lot of stuff figurin
 Play around
 ===========
 See [vrepl/README.markdown](https://github.com/lynaghk/c2/blob/master/vrepl/README.markdown) for instructions on using the built-in examples+interactive-development server (Clojure-only).
-For a full ClojureScript application example, check out the [C2-powered todo list](https://github.com/lynaghk/c2-demos/todoMVC/).
+For a full ClojureScript application example, check out the [C2-powered todo list](https://github.com/lynaghk/c2-demos/tree/master/todoMVC).
 
 There's also a two minute [screencast](https://www.youtube.com/watch?v=Urg79FmQnYs), and a longer [overview/tutorial](http://www.youtube.com/watch?feature=player_detailpage&v=T83P3PVSy_8#t=510s) video on the library.
 
