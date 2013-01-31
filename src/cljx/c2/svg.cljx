@@ -114,8 +114,9 @@
     [:g {:class (str "axis " (name orientation))}
      [:line.rule (apply hash-map (interleave [y1 y2] (:range scale)))]
      [:g.ticks
-      (unify ticks
-             (fn [d]
+      ;;Need to weave scale into tick stream so that unify updates nodes when the scale changes.
+      (unify (map vector ticks (repeat scale))
+             (fn [[d scale]]
                [:g.tick.major-tick {:transform (translate {x 0 y (scale d)})}
                 [:text {x (* parity text-margin)} (formatter d)]
                 [:line {x1 0 x2 (* parity major-tick-width)}]]))]
