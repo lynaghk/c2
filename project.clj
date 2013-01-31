@@ -4,22 +4,23 @@
   :license {:name "BSD" :url "http://www.opensource.org/licenses/BSD-3-Clause"}
 
   :dependencies [[org.clojure/clojure "1.4.0"]
-                 [org.clojure/core.match "0.2.0-alpha11"]
+                 [org.clojure/core.match "0.2.0-alpha11" :exclusions [org.clojure/clojure
+                                                                      org.clojure/core.logic]]
                  [clj-iterate "0.96"]
 
                  ;;CLJS
                  [com.keminglabs/singult "0.1.5-SNAPSHOT"]
                  [com.keminglabs/reflex "0.1.1"]]
 
-  :profiles {:dev {:dependencies [[midje "1.3.1"]
-                                  [lein-midje "1.0.8"]
+  :profiles {:dev {:dependencies [[midje "1.4.0"]
+                                  [bultitude "0.1.7"]
                                   [com.keminglabs/vomnibus "0.3.0"]]}}
 
   :min-lein-version "2.0.0"
 
-  :plugins [[com.keminglabs/cljx "0.1.2"]
-            [lein-cljsbuild "0.2.0"]
-            [lein-midje "2.0.0-SNAPSHOT"]
+  :plugins [[com.keminglabs/cljx "0.2.1"]
+            [lein-cljsbuild "0.3.0"]
+            [lein-midje "2.0.4"]
             [lein-marginalia "0.7.0"]]
 
   :source-paths ["src/clj" "src/cljs"
