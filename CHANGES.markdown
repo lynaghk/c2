@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+0.2.2
+-----
++ Fix svg/axis tick unification for changing scales
++ Add matchesSelector shim for browser compatability
++ Add histogram layout helper (thanks @jblomo!)
+
 0.2.1
 -----
 This is a bugfix + upstream lib release, see [Singult](https://github.com/lynaghk/singult) repo for more details.

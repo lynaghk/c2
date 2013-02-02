@@ -1,6 +1,8 @@
 Todo
 ====
 
+Fixup `test/integration/cljs/core_test.cljs` to use new `bind!` macro and `singult/merge!` function rather than the now-depreciated `unify!` function.
+
 Implement a Knuth & Plass line breaking system
   http://stackoverflow.com/questions/7046986/svg-using-getcomputedtextlength-to-wrap-text
 
