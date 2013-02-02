@@ -44,18 +44,16 @@
                    :extension "cljs"
                    :rules cljx.rules/cljs-rules}]}
 
-  :cljsbuild {:builds {:test {:source-path "test/integration/cljs"
+  :cljsbuild {:builds {:test {:source-paths ["test/integration/cljs"]
                               :compiler {:output-to "out/test/integration.js"
                                          :optimizations :simple
                                          :pretty-print true}}
 
-                       :scratch {:source-path "test/scratch"
+                       :scratch {:source-paths ["test/scratch"]
                                  :compiler {:output-to "out/scratch.js"
                                             :optimizations :advanced}}}
 
-
-              :test-commands {"integration" ["phantomjs"
-                                             "test/integration/runner.coffee"]}}
+              :test-commands {"integration" ["phantomjs" "test/integration/runner.coffee"]}}
 
 
   ;;generate cljx before JAR
