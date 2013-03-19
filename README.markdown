@@ -61,6 +61,8 @@ Since Clojure runs on the Java Virtual Machine, it's possible to work with much 
 C2 also leverages ClojureScript, a Clojure-to-JavaScript compiler, so you can take advantage of the expressiveness of Clojure while maintaining the reach of JavaScript.
 The ClojureScript compiler is built on Google's Closure compiler, and in many cases your visualizations may compile to JavaScript with a smaller file size than the D3.js library itself!
 
+(If you want a ClojureScript library that actually leverages D3, take a look at the awesomely polyfilled [Strokes](https://github.com/dribnet/strokes) library.)
+
 View is data
 -------------
 Rather than think of DOM nodes as foreign objects to be manipulated with methods like `addChild` or `setClass`, in C2 you build the DOM you want using standard Clojure data structures like vectors and maps.
