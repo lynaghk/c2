@@ -27,10 +27,10 @@
     (str "translate(" (float x) "," (float y) ")")))
 
 (defn scale [coordinates]
-  (cond
-   (number? coordinates) (str "scale(" (float coordinates) ")")
-   (map? coordinates) [(:x coordinates) (:y coordinates)]
-   (and (vector? coordinates) (= 2 (count count))) coordinates))
+  (if (number? coordinates)
+    (str "scale(" (float coordinates) ")")
+    (let [[x y] (svg/->xy coordinates)]
+      (str "scale(" (float x) "," (float y) ")"))))
 
 (defn rotate
   ([angle] (rotate angle [0 0]))
