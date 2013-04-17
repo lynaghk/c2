@@ -29,7 +29,7 @@
 (defn scale [coordinates]
   (if (number? coordinates)
     (str "scale(" (float coordinates) ")")
-    (let [[x y] (svg/->xy coordinates)]
+    (let [[x y] (->xy coordinates)]
       (str "scale(" (float x) "," (float y) ")"))))
 
 (defn rotate
