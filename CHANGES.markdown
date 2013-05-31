@@ -1,6 +1,13 @@
 Change Log
 ==========
 
+0.2.3
+-----
++ Update to Singult 0.1.6
++ Remove `float` stub, now that it's part of the latest ClojureScript
++ Don't use core.match in cljs namespaces, since there are unresolved conflicts upstream
++ More robust tick search algorithm
+
 0.2.2
 -----
 + Fix svg/axis tick unification for changing scales
