@@ -13,10 +13,10 @@
          (:require [c2.dom :as dom]))
 
 (defn ->xy
-  "Convert coordinates (potentially map of `{:x :y}`) to 2-vector."
+  "Ensure that coordinates (potentially map of `{:x :y}`) are a seq or vector pair."
   [coordinates]
   (cond
-   (and (vector? coordinates) (= 2 (count coordinates))) coordinates
+   (and (sequential? coordinates) (= 2 (count coordinates))) coordinates
    (map? coordinates) [(:x coordinates) (:y coordinates)]))
 
 (defn translate [coordinates]
