@@ -51,17 +51,20 @@
 (defn matches-selector?
   "Does live `node` match CSS `selector`?"
   [node selector]
-  (.matchesSelector node selector))
+  (when node
+    (.matchesSelector node selector)))
 
 (defn children
   "Return the children of a live DOM element."
   [node]
-  (.-children (->dom node)))
+  (when node
+    (.-children (->dom node))))
 
 (defn parent
   "Return parent of a live DOM node."
   [node]
-  (.-parentNode (->dom node)))
+  (when parent
+    (.-parentNode (->dom node))))
 
 
 (defn append!
