@@ -1,4 +1,4 @@
-(ns c2.t-scale
+(ns c2.t-ticks
   (:use midje.sweet
         [c2.ticks :only [search]]))
 
