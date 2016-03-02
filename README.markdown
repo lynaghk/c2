@@ -27,11 +27,25 @@ See also:
 [Annotated source](http://keminglabs.com/c2/docs/)
 
 
-EVERYTHING IS ALPHA
-===================
-ClojureScript is new.
-This library is newer.
-We have no idea what's going on, and we're going to break a lot of stuff figuring it out.
+Deprecated
+==========
+
+C2 was first released in Jan 2012 and in May 2012 its DOM-manipulation engine was factored into a separate library, [Singult](https://github.com/lynaghk/singult).
+Singult's core idea, providing an data-oriented abstraction for DOM-manipulation, has since been adopted by many other projects---most notably [React.js](https://facebook.github.io/react/) (released May 2013).
+These libraries provide a superset of C2/Singult's capabilities: Everything you can make in C2/Singult you can also make using React.js.
+React.js is likely faster (using "virtual DOM diffs" rather than direct DOM walking) and provides API hooks into low-level details via lifecycle methods.
+
+So, rather than use C2 I suggest you look into:
+
++ [React.js](https://facebook.github.io/react/): Similar ideas as C2, but supported by Facebook and the trendy JavaScript masses.
++ [Rum](https://github.com/tonsky/rum): ClojureScript bindings to React.js. This is what I use now instead of C2.
++ [Elm](elm-lang.org): A compile-to-JS language that includes a virtual DOM system, typed pattern matching, and the most humane compiler messages I've ever seen.
+
+In terms of data visualization specifically, I suggest:
+
++ [Show me the numbers](http://amzn.to/21DKexd): A great coverage of the fundamentals (hint: use a lot of bar and line charts).
++ Drawing points, rectangles, and lines using SVG or HTML flexbox.
++ Sticking to simple animations using CSS transitions or (even better) come up with a design that doesn't rely on animation/interaction.
 
 
 Play around
